@@ -1,0 +1,43 @@
+﻿@model IEnumerable<EventSwift.Models.User>
+
+@{
+    ViewBag.Title = "User Table";
+    ViewBag.SkipNavbar = true; // This hides the main layout navbar
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-4" style="color: var(--green);">Manage Users</h2>
+
+        <a href="@Url.Action("Create")" class="btn btn-success mb-3">Add User</a>
+
+        <table class="table table-bordered table-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.FullName</td>
+                        <td>@user.Username</td>
+                        <td>@user.Role</td>
+                        <td>
+                            <a href="@Url.Action("Edit", new { id = user.UserId })" class="btn btn-sm btn-primary me-1">Edit</a>
+                            <a href="@Url.Action("Delete", new { id = user.UserId })" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

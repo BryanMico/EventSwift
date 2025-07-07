@@ -1,0 +1,91 @@
+﻿@model EventSwift.Models.ProposalApproval
+
+@{
+    ViewBag.Title = "Approval Details";
+    ViewBag.SkipNavbar = true;
+
+    var fileName = System.IO.Path.GetFileName(Model.EventProposal.FilePath);
+    var fileExt = System.IO.Path.GetExtension(fileName)?.ToLower();
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-4" style="color: var(--green);">Approval Details</h2>
+
+        <!-- Two columns layout -->
+        <div class="d-flex gap-4">
+            <!-- Left Side: Details -->
+            <div style="flex: 1; min-width: 0;">
+                <dl class="row">
+                    <dt class="col-sm-4">Proposal Title</dt>
+                    <dd class="col-sm-8">@Model.EventProposal.Title</dd>
+
+                    <dt class="col-sm-4">Proposal Status</dt>
+                    <dd class="col-sm-8">@Model.EventProposal.Status</dd>
+
+                    <dt class="col-sm-4">Submitted At</dt>
+                    <dd class="col-sm-8">@Model.EventProposal.SubmittedAt.ToString("g")</dd>
+
+                    <dt class="col-sm-4">Approval Office</dt>
+                    <dd class="col-sm-8">@Model.Office</dd>
+
+                    <dt class="col-sm-4">Approval Status</dt>
+                    <dd class="col-sm-8">@Model.Status</dd>
+
+                    <dt class="col-sm-4">Action Date</dt>
+                    <dd class="col-sm-8">@((Model.ActionDate.HasValue) ? Model.ActionDate.Value.ToString("g") : "Pending")</dd>
+
+                    <dt class="col-sm-4">Proposal File</dt>
+                    <dd class="col-sm-8">
+                        <a href="@Url.Content(Model.EventProposal.FilePath)" target="_blank">View File</a> |
+                        <a href="@Url.Content(Model.EventProposal.FilePath)" download>Download File</a>
+                    </dd>
+                </dl>
+
+                @Html.ActionLink("Back to List", "ApprovalsIndex", null, new { @class = "btn btn-secondary" })
+            </div>
+
+            <!-- Right Side: File Preview -->
+            <div style="flex: 1; min-width: 0;">
+                <h5 class="mb-3">File Preview</h5>
+
+                @if (fileExt == ".txt")
+                {
+                    string fullPath = Server.MapPath(Model.EventProposal.FilePath);
+                    string fileContent = System.IO.File.Exists(fullPath) ? System.IO.File.ReadAllText(fullPath) : "File not found.";
+
+                    <pre style="background-color:#f8f9fa; border: 1px solid #ddd; padding: 10px; max-height: 500px; overflow-y: auto;">
+@fileContent
+                    </pre>
+                }
+                else if (fileExt == ".doc" || fileExt == ".docx")
+                {
+                    <p>Preview not available for Word documents.</p>
+                    <a href="@Url.Content(Model.EventProposal.FilePath)" class="btn btn-primary mb-3" target="_blank">Download @fileName</a>
+
+                    <hr />
+                    <p>Or view online via Google Docs:</p>
+                    <iframe src="https://docs.google.com/gview?url=@(Request.Url.GetLeftPart(UriPartial.Authority) + Url.Content(Model.EventProposal.FilePath))&embedded=true"
+                            style="width:100%; height:500px;" frameborder="0">
+                        Your browser does not support iframes.
+                    </iframe>
+                }
+                else if (fileExt == ".pdf")
+                {
+                    <iframe src="@Url.Content(Model.EventProposal.FilePath)" style="width: 100%; height: 500px;" frameborder="0">
+                        This browser does not support PDFs. Please download the file to view it:
+                        <a href="@Url.Content(Model.EventProposal.FilePath)">Download file</a>.
+                    </iframe>
+                }
+                else
+                {
+                    <p>No file uploaded or preview not available.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

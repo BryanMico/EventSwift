@@ -1,0 +1,68 @@
+﻿@{
+    var role = ViewBag.Role as string ?? "";
+    var notifications = ViewBag.Notifications as List<EventSwift.Models.Notification> ?? new List<EventSwift.Models.Notification>();
+}
+
+<nav class="navbar navbar-expand-lg navbar-light mb-4 shadow-sm" style="background-color: var(--light-yellow);">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h5" style="color: var(--green); font-weight: bold;">
+            @(role == "SuperAdmin" ? "Super Admin Panel" :
+              role == "Client" ? "Client Panel" :
+              "Office Panel")
+        </span>
+
+        <div class="d-flex align-items-center">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="dropdown me-3">
+                    <button class="btn btn-sm position-relative"
+                            id="notificationDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            aria-haspopup="true"
+                            type="button">
+                        <i class="bi bi-bell" style="font-size: 1.2rem;"></i>
+                        @if (notifications.Any())
+                        {
+                            <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                @notifications.Count
+                            </span>
+                        }
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationDropdown" style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+                        @if (notifications.Any())
+                        {
+                            foreach (var note in notifications)
+                            {
+                                <li>
+                                    <a href="javascript:void(0);" class="dropdown-item d-flex justify-content-between align-items-start notification-item" data-id="@note.NotificationId">
+                                        <div>
+                                            <div>@note.Message</div>
+                                            <small class="text-muted">@note.CreatedAt.ToString("g")</small>
+                                        </div>
+                                        <span class="badge bg-secondary ms-2">New</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="dropdown-item text-muted text-center">No new notifications</li>
+                        }
+                    </ul>
+                </div>
+
+                <span class="nav-link text-dark me-3">Hello, @User.Identity.Name</span>
+                @Html.ActionLink("Logout", "Logout", "Account", null, new { @class = "btn btn-sm text-white", style = "background-color: var(--green);" })
+            }
+            else
+            {
+                <span class="nav-link text-danger me-3">Not logged in</span>
+            }
+        </div>
+    </div>
+</nav>
+
+@Html.AntiForgeryToken()  <!-- Add this somewhere on your page to generate the token -->

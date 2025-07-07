@@ -1,0 +1,48 @@
+﻿@{
+    var role = "";
+    if (User.Identity.IsAuthenticated)
+    {
+        using (var db = new EventSwift.Models.DefaultConnection())
+        {
+            role = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name)?.Role;
+        }
+    }
+}
+
+<div class="d-flex flex-column flex-shrink-0 p-3" style="width: 250px; min-height: 100vh; background-color: var(--light-yellow);">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
+        <img src="~/Content/Images/eventswift_logo.png" alt="Logo" style="height: 40px;" class="me-2" />
+        <span class="fs-5" style="color: var(--green); font-weight: bold;">EventSwift</span>
+    </a>
+    <hr />
+    <ul class="nav nav-pills flex-column mb-auto">
+        @if (role == "SuperAdmin")
+        {
+            <li class="nav-item mb-2">
+                @Html.ActionLink("Analytics", "SuperAdminDashboard", "Dashboard", null, new { @class = "nav-link text-dark" })
+            </li>
+            <li class="nav-item mb-2">
+                @Html.ActionLink("Manage Users", "Index", "Users", null, new { @class = "nav-link text-dark" })
+            </li>
+        }
+        else if (role == "Client")
+        {
+            <li class="nav-item mb-2">
+                @Html.ActionLink("Dashboard", "ClientDashboard", "Dashboard", null, new { @class = "nav-link text-dark" })
+            </li>
+            <li class="nav-item mb-2">
+                @Html.ActionLink("My Proposals", "Index", "EventProposals", null, new { @class = "nav-link text-dark" })
+            </li>
+        }
+        else if (role == "VPAA" || role == "VPF" || role == "AMI" || role == "President")
+        {
+            <li class="nav-item mb-2">
+                @Html.ActionLink("Dashboard", "OfficeDashboard", "Dashboard", null, new { @class = "nav-link text-dark" })
+            </li>
+            <li class="nav-item mb-2">
+                @Html.ActionLink("Proposals", "ApprovalsIndex", "ProposalApprovals", null, new { @class = "nav-link text-dark" })
+            </li>
+        }
+    </ul>
+    <hr />
+</div>

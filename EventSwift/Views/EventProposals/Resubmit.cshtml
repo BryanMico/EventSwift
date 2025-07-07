@@ -1,0 +1,45 @@
+﻿@model EventSwift.Models.EventProposal
+
+@{
+    ViewBag.Title = "Resubmit Proposal";
+    ViewBag.SkipNavbar = true;
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2>Resubmit Proposal</h2>
+
+        <p><strong>Title:</strong> @Model.Title</p>
+        <p><strong>Status:</strong> @Model.Status</p>
+
+        @if (Model.Feedbacks != null && Model.Feedbacks.Any())
+        {
+            <h4>Feedback from Offices:</h4>
+            <ul>
+                @foreach (var fb in Model.Feedbacks)
+                {
+                    <li>
+                        <strong>@fb.Office</strong>: @fb.Feedback <br />
+                        <small><em>@fb.FeedbackDate.ToString("g")</em></small>
+                    </li>
+                }
+            </ul>
+        }
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <label for="uploadedFile">Upload corrected proposal file:</label>
+            <br />
+            <input type="file" name="uploadedFile" id="uploadedFile" />
+            <br /><br />
+
+            <button type="submit" class="btn btn-primary">Resubmit</button>
+        }
+    </div>
+</div>

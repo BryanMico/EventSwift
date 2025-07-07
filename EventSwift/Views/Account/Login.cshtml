@@ -1,0 +1,36 @@
+﻿@model EventSwift.Models.LoginViewModel
+
+@{
+    ViewBag.Title = "Login";
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%; border: 1px solid #ddd;">
+        <div class="text-center mb-4">
+            <img src="~/Content/Images/eventswift_logo.png" alt="EventSwift Logo" style="height: 50px;" />
+            <h4 class="mt-2" style="color: var(--green);">Event Swift Login</h4>
+        </div>
+
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+        {
+            <div class="mb-3">
+                @Html.LabelFor(m => m.Username, new { @class = "form-label" })
+                @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-sm", placeholder = "Enter username" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-sm", placeholder = "Enter password" })
+            </div>
+
+            <button type="submit" class="btn w-100 text-white" style="background-color: var(--green);">Login</button>
+        }
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger mt-3 text-center p-2" style="font-size: 0.85rem;">
+                @ViewBag.Error
+            </div>
+        }
+    </div>
+</div>

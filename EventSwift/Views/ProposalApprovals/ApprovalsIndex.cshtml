@@ -1,0 +1,45 @@
+﻿@model IEnumerable<EventSwift.Models.Event>
+
+@{
+    ViewBag.Title = "Events for Approval";
+    ViewBag.SkipNavbar = true;
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-4" style="color: var(--green);">Events for Approval</h2>
+
+        @if (!Model.Any())
+        {
+            <p>No events with proposals for your office.</p>
+        }
+        else
+        {
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th>Event Title</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ev in Model)
+                    {
+                        <tr>
+                            <td>@ev.Title</td>
+                            <td>@ev.Status</td>
+                            <td>
+                                @Html.ActionLink("Details", "EventDetails", new { id = ev.EventId }, new { @class = "btn btn-sm btn-primary" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

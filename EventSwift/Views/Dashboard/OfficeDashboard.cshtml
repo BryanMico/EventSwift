@@ -1,0 +1,85 @@
+﻿@using EventSwift.Models
+
+@{
+    ViewBag.Title = "Office Dashboard";
+    ViewBag.SkipNavbar = true; // We are using custom navbar
+
+    // Cast ViewBag.RecentProposals to strongly typed list for easy access
+    var recentProposals = ViewBag.RecentProposals as List<ProposalSummaryVM>;
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-4" style="color: var(--green);">Office Dashboard</h2>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card text-white" style="background-color: var(--green);">
+                    <div class="card-body">
+                        <h5 class="card-title">Pending Proposals</h5>
+                        <p class="card-text display-6">@ViewBag.PendingProposals</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-white" style="background-color: var(--orange);">
+                    <div class="card-body">
+                        <h5 class="card-title">Approved Proposals</h5>
+                        <p class="card-text display-6">@ViewBag.ApprovedProposals</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-white" style="background-color: var(--brown);">
+                    <div class="card-body">
+                        <h5 class="card-title">Rejected Proposals</h5>
+                        <p class="card-text display-6">@ViewBag.RejectedProposals</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header" style="background-color: var(--blue); color: black;">
+                Recent Proposals
+            </div>
+            <ul class="list-group list-group-flush">
+                @if (recentProposals != null && recentProposals.Any())
+                {
+                    foreach (var proposal in recentProposals)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                            <div>
+                                <a href="@Url.Action("Details", "EventProposals", new { id = proposal.EventProposalId })"
+                                   style="text-decoration:none; color: inherit; font-weight: 600; font-size: 1.05rem;">
+                                    @proposal.Title
+                                </a>
+                                <div class="text-muted small">
+                                    @* Format date nicely; assuming you added SubmittedAt property to ProposalSummaryVM *@
+                                    @((proposal.SubmittedAt != null) ? proposal.SubmittedAt.ToString("MMM dd, yyyy HH:mm") : "")
+                                </div>
+                            </div>
+                            <span class="badge rounded-pill
+                        @(proposal.Status == "Pending" ? "bg-warning text-dark" :
+                          proposal.Status == "Approved" ? "bg-success" :
+                          proposal.Status == "Rejected" ? "bg-danger" : "bg-secondary")"
+                                  style="min-width: 90px; text-align: center; font-weight: 600;">
+                                @proposal.Status
+                            </span>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item text-muted text-center">No recent proposals.</li>
+                }
+            </ul>
+        </div>
+
+
+    </div>
+</div>

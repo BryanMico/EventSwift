@@ -1,0 +1,57 @@
+﻿@model EventSwift.Models.EventProposal
+
+@{
+    ViewBag.Title = "Proposal Details";
+    ViewBag.SkipNavbar = true;
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-4" style="color: var(--green);">Proposal: @Model.Title</h2>
+
+        <dl class="row">
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">@Model.Status</dd>
+
+            <dt class="col-sm-3">Submitted At</dt>
+            <dd class="col-sm-9">@Model.SubmittedAt.ToString("f")</dd>
+
+            <dt class="col-sm-3">Target Office</dt>
+            <dd class="col-sm-9">@Model.TargetOfficeRole</dd>
+
+            <dt class="col-sm-3">File</dt>
+            <dd class="col-sm-9">
+                <a href="@Url.Content(Model.FilePath)" target="_blank">View / Download Proposal File</a>
+            </dd>
+        </dl>
+
+        <hr />
+
+        <h5>Feedbacks</h5>
+        @if (Model.Feedbacks.Any())
+        {
+            <ul class="list-group mb-3">
+                @foreach (var feedback in Model.Feedbacks)
+                {
+                    <li class="list-group-item">
+                        <strong>@feedback.Office:</strong> @feedback.Feedback <br />
+                        <small class="text-muted">@feedback.FeedbackDate.ToString("g")</small>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No feedback yet.</p>
+        }
+
+
+        <p class="mt-3">
+            @Html.ActionLink("Back to Event Details", "Details", "EventProposals", new { id = Model.EventId }, new { @class = "btn btn-secondary" })
+        </p>
+    </div>
+</div>

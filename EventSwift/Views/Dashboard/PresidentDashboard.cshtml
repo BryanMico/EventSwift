@@ -1,0 +1,117 @@
+﻿@model IEnumerable<EventSwift.Models.Event>
+
+@{
+    ViewBag.Title = "President Dashboard - Pending Approvals";
+    ViewBag.SkipNavbar = true;
+}
+
+<div class="d-flex flex-column">
+    @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+    <div class="flex-grow-1 p-3">
+        <h2 class="mb-4" style="color: var(--green);">President Dashboard - Pending Approvals</h2>
+
+        @if (!Model.Any())
+        {
+            <p>No events pending your approval at this time.</p>
+        }
+        else
+        {
+            <div class="accordion" id="eventsAccordion">
+                @foreach (var ev in Model)
+                {
+                    var accordionId = $"event-{ev.EventId}";
+
+                    <div class="accordion-item mb-3">
+                        <h2 class="accordion-header" id="heading-@ev.EventId">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@accordionId" aria-expanded="false" aria-controls="@accordionId">
+                                @ev.Title - Status: @ev.Status
+                            </button>
+                        </h2>
+
+                        <div id="@accordionId" class="accordion-collapse collapse" aria-labelledby="heading-@ev.EventId" data-bs-parent="#eventsAccordion">
+                            <div class="accordion-body">
+
+                                <h5>Proposals/Documents</h5>
+
+                                @if (ev.Proposals != null && ev.Proposals.Any())
+                                {
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Status</th>
+                                                <th>Submitted At</th>
+                                                <th>Target Office</th>
+                                                <th>Approved By</th>
+                                                <th>File</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var prop in ev.Proposals)
+                                            {
+                                                <tr>
+                                                    <td>@prop.Title</td>
+                                                    <td>@prop.Status</td>
+                                                    <td>@prop.SubmittedAt.ToString("g")</td>
+                                                    <td>@prop.TargetOfficeRole</td>
+                                                    <td>
+                                                        @{
+                                                            var approvedOffices = (prop.Approvals ?? new List<EventSwift.Models.ProposalApproval>())
+                                                                .Where(a => a.Status == "Approved")
+                                                                .Select(a => a.Office)
+                                                                .ToList();
+                                                        }
+                                                        @if (approvedOffices.Any())
+                                                        {
+                                                            string.Join(", ", approvedOffices);
+                                                        }
+                                                        else
+                                                        {
+                                                            <em>None</em>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <a href="@Url.Content(prop.FilePath)" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                            View File
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <p>No proposals submitted for this event.</p>
+                                }
+
+                                <div class="mt-3">
+                                    @using (Html.BeginForm("ApproveEvent", "EventProposals", FormMethod.Post))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        @Html.Hidden("eventId", ev.EventId)
+
+                                        <div class="mb-3">
+                                            <label for="approvedDate-@ev.EventId" class="form-label">Select Event Date</label>
+                                            <input type="date" class="form-control" name="approvedDate" id="approvedDate-@ev.EventId" required />
+                                        </div>
+
+                                        <button type="submit" class="btn btn-success"
+                                                onclick="return confirm('Approve this event? This action cannot be undone.');">
+                                            Approve Event
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+}

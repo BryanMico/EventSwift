@@ -1,0 +1,192 @@
+﻿@model EventSwift.Models.ClientDashboardViewModel
+
+@{
+    ViewBag.Title = "Client Dashboard";
+    ViewBag.SkipNavbar = true;
+
+    // Prepare the events list as a JSON string safely
+    var eventsList = Model.Events.Select(e => new
+    {
+        id = e.Id,
+        title = e.Title,
+        start = e.StartDate?.ToString("yyyy-MM-dd"), // ✅ Use null-safe call
+        extendedProps = new
+        {
+            status = e.Status ?? "Unknown",
+        }
+    }).ToList();
+
+
+
+    var eventsJson = Newtonsoft.Json.JsonConvert.SerializeObject(eventsList);
+}
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+<style>
+    /* Smaller font size for event titles */
+    .fc .fc-event-title {
+        font-size: 0.65rem !important;
+    }
+
+    /* Smaller font size for day numbers */
+    .fc .fc-daygrid-day-number {
+        font-size: 0.7rem !important;
+    }
+
+    /* Reduce event padding to make events smaller */
+    .fc .fc-event {
+        padding: 2px 4px !important;
+    }
+
+    /* Optional: reduce header font size */
+    .fc .fc-toolbar-title {
+        font-size: 1rem !important;
+    }
+
+    /* Container for calendar and event preview side-by-side */
+    .calendar-container {
+        display: flex;
+        gap: 20px;
+        max-width: 100%;
+        border: 1px solid #ddd;
+        padding: 10px;
+        font-family: Arial, sans-serif;
+        font-size: 0.85rem;
+    }
+
+    #calendar {
+        flex: 1 1 600px;
+        height: 400px;
+        overflow: visible !important;
+    }
+
+    #eventPreview {
+        flex: 0 0 280px;
+        border-left: 1px solid #ccc;
+        padding-left: 15px;
+        font-size: 0.9rem;
+    }
+
+        #eventPreview h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        #eventPreview p {
+            margin: 5px 0;
+        }
+
+        /* Placeholder styling when no event is selected */
+        #eventPreview.empty {
+            color: #777;
+            font-style: italic;
+        }
+</style>
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-4" style="color: var(--green);">Client Dashboard</h2>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card text-white" style="background-color: var(--green);">
+                    <div class="card-body">
+                        <h5 class="card-title">My Proposals</h5>
+                        <p class="card-text display-6">@Model.MyProposalsCount</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card text-white" style="background-color: var(--orange);">
+                    <div class="card-body">
+                        <h5 class="card-title">Pending Approvals</h5>
+                        <p class="card-text display-6">@Model.PendingApprovalsCount</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card text-white" style="background-color: var(--brown);">
+                    <div class="card-body">
+                        <h5 class="card-title">Rejected Proposals</h5>
+                        <p class="card-text display-6">@Model.RejectedProposalsCount</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="calendar-container">
+            <div id="calendar"></div>
+
+            <div id="eventPreview" class="empty">
+                <h4>Event Details</h4>
+                <p>Select an event on the calendar to see details here.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var previewEl = document.getElementById('eventPreview');
+
+            if (!calendarEl || !previewEl) {
+                console.error("Required elements not found");
+                return;
+            }
+
+            var events = @Html.Raw(eventsJson);
+
+            function clearPreview() {
+                previewEl.classList.add('empty');
+                previewEl.innerHTML = `
+                    <h4>Event Details</h4>
+                    <p>Select an event on the calendar to see details here.</p>
+                `;
+            }
+
+            function showPreview(event) {
+                previewEl.classList.remove('empty');
+                previewEl.innerHTML = `
+                    <h4>${event.title}</h4>
+                    <p><strong>Date:</strong> ${event.startStr}</p>
+                    <p><strong>Status:</strong> ${event.extendedProps.status}</p>
+                `;
+            }
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 450,
+                events: events,
+                eventDidMount: function (info) {
+                    var status = info.event.extendedProps.status;
+                    if (status) {
+                        info.el.setAttribute('title', 'Status: ' + status);
+                    }
+                },
+                eventClick: function(info) {
+                    showPreview(info.event);
+                },
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                }
+            });
+
+            calendar.render();
+
+            clearPreview();
+        });
+    </script>
+}

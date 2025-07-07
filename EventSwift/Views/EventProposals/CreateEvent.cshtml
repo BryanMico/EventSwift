@@ -1,0 +1,31 @@
+﻿@model EventSwift.Models.Event
+
+@{
+    ViewBag.Title = "Create New Event";
+    ViewBag.SkipNavbar = true;
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-4" style="color: var(--green);">Create New Event</h2>
+
+        @using (Html.BeginForm("CreateEvent", "EventProposals", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                @Html.LabelFor(model => model.Title)
+                @Html.TextBoxFor(model => model.Title, new { @class = "form-control", placeholder = "Enter event title" })
+                @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+            </div>
+
+            <button type="submit" class="btn text-white" style="background-color: var(--green);">
+                Create Event
+            </button>
+        }
+    </div>
+</div>

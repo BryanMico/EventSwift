@@ -1,0 +1,157 @@
+﻿@model EventSwift.Models.Statistics.SuperAdminDashboardVM
+
+@{
+    ViewBag.Title = "Super Admin Dashboard";
+    ViewBag.SkipNavbar = true;
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-3" style="color: var(--green);">Dashboard</h2>
+
+        <div class="row row-cols-6 g-2 mb-2">
+            <!-- Cards -->
+            <div class="col">
+                <div class="card text-white bg-success p-2 text-center">
+                    <h6>Total Users</h6>
+                    <p class="fs-4 mb-0">@Model.TotalUsers</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-warning p-2 text-center">
+                    <h6>Pending Proposals</h6>
+                    <p class="fs-4 mb-0">@Model.PendingProposals</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-primary p-2 text-center">
+                    <h6>Approved Proposals</h6>
+                    <p class="fs-4 mb-0">@Model.ApprovedProposals</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-danger p-2 text-center">
+                    <h6>Rejected Proposals</h6>
+                    <p class="fs-4 mb-0">@Model.RejectedProposals</p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-info p-2 text-center">
+                    <h6>Avg Approval</h6>
+                    <p class="fs-4 mb-0">@Model.AverageApprovalDays.ToString("0.0")<small> days</small></p>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-secondary p-2 text-center">
+                    <h6>Approval Rate</h6>
+                    <p class="fs-4 mb-0">@Model.ApprovalPercentage.ToString("0.0")<small>%</small></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-2 mb-2">
+            <!-- Approvals by Office Chart -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Approvals by Office</h6>
+                        <div style="height: 150px;">
+                            <canvas id="officeApprovalChart" style="height: 100%; width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Trends Chart -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body p-2">
+                        <h6 class="card-title">Monthly Trends (6 months)</h6>
+                        <div style="height: 150px;">
+                            <canvas id="monthlyTrendChart" style="height: 100%; width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+   <div class="row mt-2">
+    <!-- Proposal Status Pie Chart Full Width -->
+    <div class="col-md-12">
+        <div class="card h-100">
+            <div class="card-body p-2">
+                <h6 class="card-title text-center">Proposal Status Breakdown</h6>
+                <div style="height: 250px;">
+                    <canvas id="statusPieChart" style="height: 100%; width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Office Bar Chart
+        const officeData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ApprovalsByOffice));
+        const labelsOffice = officeData.map(x => x.Office);
+        const approvedCounts = officeData.map(x => x.ApprovedCount);
+        const pendingCounts = officeData.map(x => x.PendingCount);
+        const rejectedCounts = officeData.map(x => x.RejectedCount);
+
+        new Chart(document.getElementById('officeApprovalChart'), {
+            type: 'bar',
+            data: {
+                labels: labelsOffice,
+                datasets: [
+                    { label: 'Approved', data: approvedCounts, backgroundColor: 'rgba(40, 167, 69, 0.7)' },
+                    { label: 'Pending', data: pendingCounts, backgroundColor: 'rgba(255, 193, 7, 0.7)' },
+                    { label: 'Rejected', data: rejectedCounts, backgroundColor: 'rgba(220, 53, 69, 0.7)' }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Monthly Trends Line Chart
+        const monthlyStats = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MonthlyStats));
+        const labelsMonth = monthlyStats.map(x => x.Month);
+        const submittedData = monthlyStats.map(x => x.Submitted);
+        const approvedData = monthlyStats.map(x => x.Approved);
+
+        new Chart(document.getElementById('monthlyTrendChart'), {
+            type: 'line',
+            data: {
+                labels: labelsMonth,
+                datasets: [
+                    { label: 'Submitted', data: submittedData, borderColor: 'rgba(54, 162, 235, 0.8)', fill: false, tension: 0.2 },
+                    { label: 'Approved', data: approvedData, borderColor: 'rgba(40, 167, 69, 0.8)', fill: false, tension: 0.2 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Pie Chart
+        const statusDataRaw = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ProposalStatusBreakdown));
+        const statusLabels = statusDataRaw.map(x => x.Status);
+        const statusCounts = statusDataRaw.map(x => x.Count);
+        const backgroundColors = ['#ffc107', '#28a745', '#dc3545', '#6c757d'];
+
+        new Chart(document.getElementById('statusPieChart'), {
+            type: 'pie',
+            data: {
+                labels: statusLabels,
+                datasets: [{ data: statusCounts, backgroundColor: backgroundColors.slice(0, statusLabels.length) }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    </script>
+}

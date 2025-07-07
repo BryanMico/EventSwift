@@ -1,0 +1,49 @@
+﻿@model IEnumerable<EventSwift.Models.Event>
+
+@{
+    ViewBag.Title = "My Events";
+    ViewBag.SkipNavbar = true;
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-4" style="color: var(--green);">My Events</h2>
+
+        <p>
+            @Html.ActionLink("Create New Event", "CreateEvent", "EventProposals", null, new { @class = "btn text-white", style = "background-color: var(--green);" })
+        </p>
+
+        <table class="table table-bordered table-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td>@item.Status</td>
+                        <td>
+                            @Html.ActionLink("Details", "Details", "EventProposals", new { id = item.EventId }, new { @class = "btn btn-sm btn-primary me-1" })
+
+                            @using (Html.BeginForm("DeleteEvent", "EventProposals", FormMethod.Post, new { onsubmit = "return confirm('Are you sure you want to delete this event?');" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("eventId", item.EventId)
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

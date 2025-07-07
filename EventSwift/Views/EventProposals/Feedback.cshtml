@@ -1,0 +1,44 @@
+﻿@model EventSwift.Models.EventProposal
+@{
+    ViewBag.Title = "Respond to Feedback";
+    ViewBag.SkipNavbar = true;
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-4" style="color: var(--green);">Respond to Feedback</h2>
+
+        <h5>Latest Feedback:</h5>
+        @if (Model.Feedbacks.Any())
+        {
+            <ul class="list-group mb-3">
+                @foreach (var fb in Model.Feedbacks)
+                {
+                    <li class="list-group-item">@fb.FeedbackMessage - @fb.SubmittedAt</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No feedback yet.</p>
+        }
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label for="feedback">Your Response</label>
+                <textarea name="feedback" class="form-control" required></textarea>
+            </div>
+
+            <button type="submit" class="btn text-white" style="background-color: var(--green);">Submit Response</button>
+        }
+
+        @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary mt-3" })
+    </div>
+</div>

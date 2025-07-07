@@ -1,0 +1,54 @@
+﻿:root {
+    --green: #00673f;
+    --light-yellow: #eeedc2;
+    --orange: #f3a750;
+    --brown: #a7582b;
+    --light-brown: #d3ab6d;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-size: 0.9rem; /* Smaller base font size */
+    overflow: hidden;
+}
+
+main {
+    flex: 1;
+}
+
+.navbar-custom {
+    background-color: var(--light-yellow);
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    font-size: 0.9rem; /* Smaller navbar font */
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: var(--green) !important;
+    font-size: 1rem; /* Smaller brand text */
+}
+
+.nav-link {
+    color: var(--green) !important;
+    font-weight: 500;
+    font-size: 0.85rem; /* Smaller nav link text */
+    padding: 0.4rem 0.6rem; /* Smaller nav link spacing */
+}
+
+    .nav-link:hover {
+        color: var(--orange) !important;
+    }
+
+footer {
+    background-color: var(--light-brown);
+    color: white;
+    font-size: 0.85rem; /* Smaller footer text */
+    padding: 0.1rem 0; /* Compact footer padding */
+}
+
+header img {
+    height: 40px !important; /* Smaller logo size */
+}

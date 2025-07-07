@@ -1,0 +1,12 @@
+| Time              | Activity                           | Focus            |
+| ----------------- | ---------------------------------- | ---------------- |
+| 1:30am - 3:00am   | Work shift                         | Work             |
+| 3:00am - 3:30am   | Light snack, wind down             | Energy balance   |
+| 3:30am - 7:00am   | Core sleep (3.5 hours)             | Recovery         |
+| 7:00am - 11:00am  | Work shift                         | Work             |
+| 11:00am - 12:30pm | Brunch + light walk + sunlight     | Mind, Skin, Body |
+| 12:30pm - 3:30pm  | Core nap (3 hours)                 | Sleep recovery   |
+| 3:30pm - 5:30pm   | Study / Side Hustle / Freelance    | Earn, Graduate   |
+| 6:00pm - 8:00pm   | Work shift                         | Work             |
+| 8:00pm - 9:00pm   | Dinner + wind down                 | Nutrition        |
+| 9:00pm - 1:30am   | Study / Freelance / Skill Building | Earn, Graduate   |

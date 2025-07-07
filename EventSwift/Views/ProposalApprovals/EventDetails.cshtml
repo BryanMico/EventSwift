@@ -1,0 +1,59 @@
+@model IEnumerable<EventSwift.Models.EventProposal>
+
+@{
+    ViewBag.Title = "Proposals for Event: " + (ViewBag.EventTitle ?? "");
+    ViewBag.SkipNavbar = true;
+    var role = ViewBag.Role as string ?? "";
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2 class="mb-4" style="color: var(--green);">Proposals for Event: @ViewBag.EventTitle</h2>
+        <p>Status: @ViewBag.EventStatus</p>
+        <a href="@Url.Action("ApprovalsIndex")" class="btn btn-secondary mb-3">Back to Events</a>
+
+        @if (!Model.Any())
+        {
+            <p>No proposals for your office in this event.</p>
+        }
+        else
+        {
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Submitted At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var proposal in Model)
+                    {
+                        var approval = proposal.Approvals.FirstOrDefault(a => a.Office == role);
+                        <tr>
+                            <td>@proposal.Title</td>
+                            <td>@(approval != null ? approval.Status : "-")</td>
+                            <td>@proposal.SubmittedAt.ToString("g")</td>
+                            <td>
+                                @if (approval != null && (approval.Status == "Pending" || approval.Status == "Resubmitted"))
+                                {
+                                    @Html.ActionLink("Approve/Reject", "Action", new { id = approval.ProposalApprovalId }, new { @class = "btn btn-sm btn-success me-1" })
+                                }
+                                @Html.ActionLink("Details", "Details", new { id = approval?.ProposalApprovalId }, new { @class = "btn btn-sm btn-primary me-1" })
+                                @if (approval != null && approval.Status == "Rejected")
+                                {
+                                    @Html.ActionLink("Resubmit", "Resubmit", "EventProposals", new { id = proposal.EventProposalId }, new { @class = "btn btn-sm btn-warning me-1" })
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div> 

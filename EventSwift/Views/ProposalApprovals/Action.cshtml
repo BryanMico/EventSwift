@@ -1,0 +1,84 @@
+﻿@model EventSwift.Models.ProposalApproval
+
+@{
+    ViewBag.Title = "Approve or Reject Proposal";
+    ViewBag.SkipNavbar = true;
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <h2>Approve or Reject Proposal</h2>
+
+        <dl class="row">
+            <dt class="col-sm-3">Title</dt>
+            <dd class="col-sm-9">@Model.EventProposal.Title</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">@Model.EventProposal.Status</dd>
+
+            <dt class="col-sm-3">Submitted At</dt>
+            <dd class="col-sm-9">@Model.EventProposal.SubmittedAt.ToString("g")</dd>
+        </dl>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.ProposalApprovalId" />
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" value="" id="rejectToggle" />
+                <label class="form-check-label" for="rejectToggle">
+                    I want to reject this proposal and provide feedback
+                </label>
+            </div>
+
+            <div class="mb-3" id="feedbackContainer" style="display:none;">
+                <label for="feedbackMessage" class="form-label">Feedback for rejection:</label>
+                <textarea class="form-control" id="feedbackMessage" name="feedbackMessage" rows="4"></textarea>
+                @Html.ValidationMessage("feedbackMessage", "", new { @class = "text-danger" })
+            </div>
+
+            <button type="submit" id="approveBtn" class="btn btn-success me-2" name="action" value="Approve">Approve</button>
+            <button type="submit" id="rejectBtn" class="btn btn-danger" name="action" value="Reject">Reject</button>
+            @Html.ActionLink("Cancel", "ApprovalsIndex", null, new { @class = "btn btn-secondary ms-2" })
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const rejectToggle = document.getElementById('rejectToggle');
+        const feedbackContainer = document.getElementById('feedbackContainer');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const rejectBtn = document.getElementById('rejectBtn');
+
+        // Show/hide feedback textarea based on checkbox
+        rejectToggle.addEventListener('change', function () {
+            if (this.checked) {
+                feedbackContainer.style.display = 'block';
+            } else {
+                feedbackContainer.style.display = 'none';
+                feedbackMessage.value = '';  // clear feedback when unchecked
+            }
+        });
+
+        // Validate feedback when Reject button clicked
+        rejectBtn.addEventListener('click', function (e) {
+            if (!rejectToggle.checked) {
+                e.preventDefault();
+                alert('Please check "I want to reject" to provide feedback.');
+                return;
+            }
+
+            if (feedbackMessage.value.trim() === '') {
+                e.preventDefault();
+                alert('Please provide feedback when rejecting.');
+                feedbackMessage.focus();
+            }
+        });
+    </script>
+}
