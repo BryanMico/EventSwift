@@ -9,51 +9,95 @@
 <div class="d-flex">
     @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
 
-    <div class="flex-grow-1 p-2">
+    <div class="flex-grow-1 p-4">
         @Html.Partial("~/Views/Shared/_Navbar.cshtml")
 
-        <h2 class="mb-4" style="color: var(--green);">Proposals for Event: @ViewBag.EventTitle</h2>
-        <p>Status: @ViewBag.EventStatus</p>
-        <a href="@Url.Action("ApprovalsIndex")" class="btn btn-secondary mb-3">Back to Events</a>
+        @Html.Partial("~/Views/Shared/_SectionHeader.cshtml", new ViewDataDictionary { { "Icon", "bi-calendar-event" }, { "Text", $"Proposals for Event: {ViewBag.EventTitle}" }, { "Color", "var(--green)" }, { "Status", ViewBag.EventStatus } })
 
-        @if (!Model.Any())
-        {
-            <p>No proposals for your office in this event.</p>
-        }
-        else
-        {
-            <table class="table table-bordered table-sm">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Status</th>
-                        <th>Submitted At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var proposal in Model)
-                    {
-                        var approval = proposal.Approvals.FirstOrDefault(a => a.Office == role);
-                        <tr>
-                            <td>@proposal.Title</td>
-                            <td>@(approval != null ? approval.Status : "-")</td>
-                            <td>@proposal.SubmittedAt.ToString("g")</td>
-                            <td>
-                                @if (approval != null && (approval.Status == "Pending" || approval.Status == "Resubmitted"))
+        <a href="@Url.Action("ApprovalsIndex")" class="btn btn-outline-custom mb-3"><i class="bi bi-arrow-left me-1"></i>Back to Events</a>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
+                <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
+                    <i class="bi bi-file-earmark-text me-2"></i>Proposals List
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.Any())
+                {
+                    <div class="text-center py-5">
+                        <i class="bi bi-file-earmark-x" style="font-size: 3rem; color: var(--orange);"></i>
+                        <h5 class="mt-3 mb-2" style="color: var(--green);">No Proposals</h5>
+                        <p class="text-muted mb-0">There are currently no proposals for your office in this event.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="color: var(--green); font-weight: 600;"><i class="bi bi-file-earmark-text me-1"></i>Title</th>
+                                    <th style="color: var(--green); font-weight: 600;"><i class="bi bi-info-circle me-1"></i>Status</th>
+                                    <th style="color: var(--green); font-weight: 600;"><i class="bi bi-clock me-1"></i>Submitted At</th>
+                                    <th style="color: var(--green); font-weight: 600;"><i class="bi bi-gear me-1"></i>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var proposal in Model)
                                 {
-                                    @Html.ActionLink("Approve/Reject", "Action", new { id = approval.ProposalApprovalId }, new { @class = "btn btn-sm btn-success me-1" })
+                                    var approval = proposal.Approvals.FirstOrDefault(a => a.Office == role);
+                                    <tr>
+                                        <td class="fw-semibold" style="font-size: 1.05rem;">
+                                            <i class="bi bi-file-earmark-text me-1" style="color: var(--green);"></i>@proposal.Title
+                                        </td>
+                                        <td>
+                                            @if (approval != null)
+                                            {
+                                                if (approval.Status == "Approved")
+                                                {
+                                                    <span class="badge" style="background: var(--green); color: #fff;">Approved</span>
+                                                }
+                                                else if (approval.Status == "Pending")
+                                                {
+                                                    <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
+                                                }
+                                                else if (approval.Status == "Rejected")
+                                                {
+                                                    <span class="badge" style="background: var(--brown); color: #fff;">Rejected</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@approval.Status</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">-</span>
+                                            }
+                                        </td>
+                                        <td>@proposal.SubmittedAt.ToString("g")</td>
+                                        <td>
+                                            @if (approval != null && (approval.Status == "Pending" || approval.Status == "Resubmitted"))
+                                            {
+                                                <a href="@Url.Action("Details", "ProposalApprovals", new { id = approval.ProposalApprovalId })" class="btn btn-sm btn-custom px-3 d-inline-flex align-items-center gap-1 mb-1"><i class="bi bi-check2-square"></i> Take Action</a>
+                                            }
+                                            else if (approval != null)
+                                            {
+                                                <a href="@Url.Action("Details", "ProposalApprovals", new { id = approval.ProposalApprovalId })" class="btn btn-sm btn-outline-custom px-3 d-inline-flex align-items-center gap-1 mb-1"><i class="bi bi-eye"></i> View</a>
+                                            }
+                                            @if (approval != null && approval.Status == "Rejected")
+                                            {
+                                                <a href="@Url.Action("Resubmit", "EventProposals", new { id = proposal.EventProposalId })" class="btn btn-sm btn-warning d-inline-flex align-items-center gap-1 mb-1"><i class="bi bi-arrow-repeat"></i> Resubmit</a>
+                                            }
+                                        </td>
+                                    </tr>
                                 }
-                                @Html.ActionLink("Details", "Details", new { id = approval?.ProposalApprovalId }, new { @class = "btn btn-sm btn-primary me-1" })
-                                @if (approval != null && approval.Status == "Rejected")
-                                {
-                                    @Html.ActionLink("Resubmit", "Resubmit", "EventProposals", new { id = proposal.EventProposalId }, new { @class = "btn btn-sm btn-warning me-1" })
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 </div> 

@@ -75,16 +75,20 @@ namespace EventSwift.Controllers
             if (approval == null)
                 return HttpNotFound();
 
+            var currentUser = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
+            ViewBag.CurrentUser = currentUser;
+
             return View(approval);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Action(int id, string action, string feedbackMessage)
+        public ActionResult Action(int id, string action, string feedbackMessage, DateTime? eventDate)
         {
             var approval = db.ProposalApprovals
                    .Include(a => a.EventProposal)
                    .Include(a => a.EventProposal.Client)
+                   .Include(a => a.EventProposal.Event)
                    .FirstOrDefault(a => a.ProposalApprovalId == id);
 
             if (approval == null)
@@ -95,6 +99,12 @@ namespace EventSwift.Controllers
                 approval.Status = "Approved";
                 approval.ActionDate = DateTime.Now;
                 approval.EventProposal.Status = "Approved";
+
+                // If VPA is approving, set the event date
+                if (approval.Office == "VPA" && eventDate.HasValue)
+                {
+                    approval.EventProposal.Event.ApprovedDate = eventDate.Value;
+                }
 
                 // 🔔 Notify Client about approval (Username should only be for Clients)
                 db.Notifications.Add(new Notification
@@ -110,6 +120,8 @@ namespace EventSwift.Controllers
                 if (string.IsNullOrWhiteSpace(feedbackMessage))
                 {
                     ModelState.AddModelError("feedbackMessage", "Feedback message is required when rejecting.");
+                    var currentUser = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
+                    ViewBag.CurrentUser = currentUser;
                     return View(approval);
                 }
 
@@ -138,6 +150,8 @@ namespace EventSwift.Controllers
             else
             {
                 ModelState.AddModelError("", "Invalid action.");
+                var currentUser = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
+                ViewBag.CurrentUser = currentUser;
                 return View(approval);
             }
 

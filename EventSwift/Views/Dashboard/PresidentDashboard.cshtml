@@ -1,117 +1,173 @@
-﻿@model IEnumerable<EventSwift.Models.Event>
+﻿@model EventSwift.Controllers.DashboardController.PresidentDashboardViewModel
 
 @{
-    ViewBag.Title = "President Dashboard - Pending Approvals";
+    ViewBag.Title = "President Dashboard";
     ViewBag.SkipNavbar = true;
 }
 
-<div class="d-flex flex-column">
+@if (TempData["Success"] != null || TempData["Error"] != null)
+{
+    <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+        <div class="toast align-items-center text-bg-@(TempData["Error"] != null ? "danger" : "success") border-0 show" role="alert" id="feedbackToast">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @(TempData["Error"] ?? TempData["Success"])
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="d-flex flex-column min-vh-100">
     @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+    <div class="container-fluid flex-grow-1 py-4">
+        <div class="mb-4">
+            <h2 class="fw-bold mb-1" style="color: var(--green);">
+                <i class="bi bi-award me-2"></i> President Dashboard
+            </h2>
+            <div class="text-muted mb-3">Welcome, President!</div>
+        </div>
 
-    <div class="flex-grow-1 p-3">
-        <h2 class="mb-4" style="color: var(--green);">President Dashboard - Pending Approvals</h2>
-
-        @if (!Model.Any())
-        {
-            <p>No events pending your approval at this time.</p>
-        }
-        else
-        {
-            <div class="accordion" id="eventsAccordion">
-                @foreach (var ev in Model)
-                {
-                    var accordionId = $"event-{ev.EventId}";
-
-                    <div class="accordion-item mb-3">
-                        <h2 class="accordion-header" id="heading-@ev.EventId">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@accordionId" aria-expanded="false" aria-controls="@accordionId">
-                                @ev.Title - Status: @ev.Status
-                            </button>
-                        </h2>
-
-                        <div id="@accordionId" class="accordion-collapse collapse" aria-labelledby="heading-@ev.EventId" data-bs-parent="#eventsAccordion">
-                            <div class="accordion-body">
-
-                                <h5>Proposals/Documents</h5>
-
-                                @if (ev.Proposals != null && ev.Proposals.Any())
-                                {
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Title</th>
-                                                <th>Status</th>
-                                                <th>Submitted At</th>
-                                                <th>Target Office</th>
-                                                <th>Approved By</th>
-                                                <th>File</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var prop in ev.Proposals)
-                                            {
-                                                <tr>
-                                                    <td>@prop.Title</td>
-                                                    <td>@prop.Status</td>
-                                                    <td>@prop.SubmittedAt.ToString("g")</td>
-                                                    <td>@prop.TargetOfficeRole</td>
-                                                    <td>
-                                                        @{
-                                                            var approvedOffices = (prop.Approvals ?? new List<EventSwift.Models.ProposalApproval>())
-                                                                .Where(a => a.Status == "Approved")
-                                                                .Select(a => a.Office)
-                                                                .ToList();
-                                                        }
-                                                        @if (approvedOffices.Any())
-                                                        {
-                                                            string.Join(", ", approvedOffices);
-                                                        }
-                                                        else
-                                                        {
-                                                            <em>None</em>
-                                                        }
-                                                    </td>
-                                                    <td>
-                                                        <a href="@Url.Content(prop.FilePath)" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                            View File
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                }
-                                else
-                                {
-                                    <p>No proposals submitted for this event.</p>
-                                }
-
-                                <div class="mt-3">
-                                    @using (Html.BeginForm("ApproveEvent", "EventProposals", FormMethod.Post))
-                                    {
-                                        @Html.AntiForgeryToken()
-                                        @Html.Hidden("eventId", ev.EventId)
-
-                                        <div class="mb-3">
-                                            <label for="approvedDate-@ev.EventId" class="form-label">Select Event Date</label>
-                                            <input type="date" class="form-control" name="approvedDate" id="approvedDate-@ev.EventId" required />
-                                        </div>
-
-                                        <button type="submit" class="btn btn-success"
-                                                onclick="return confirm('Approve this event? This action cannot be undone.');">
-                                            Approve Event
-                                        </button>
-                                    }
-                                </div>
-                            </div>
+        <!-- Stat Cards Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="bg-warning bg-opacity-25 rounded-circle p-3"><i class="bi bi-hourglass-split fs-2 text-warning"></i></div>
+                        <div>
+                            <div class="fs-4 fw-bold">@Model.PendingCount</div>
+                            <div class="text-muted">Pending Events</div>
                         </div>
                     </div>
-                }
+                </div>
             </div>
-        }
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="bg-success bg-opacity-25 rounded-circle p-3"><i class="bi bi-check-circle fs-2 text-success"></i></div>
+                        <div>
+                            <div class="fs-4 fw-bold">@Model.ApprovedCount</div>
+                            <div class="text-muted">Approved Events</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <div class="bg-info bg-opacity-25 rounded-circle p-3"><i class="bi bi-calendar-event fs-2 text-info"></i></div>
+                        <div>
+                            <div class="fs-4 fw-bold">@Model.TotalCount</div>
+                            <div class="text-muted">Total Events</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Events Section -->
+        <div class="mb-5">
+            <div class="d-flex align-items-center mb-3">
+                <h4 class="fw-semibold mb-0" style="color: var(--green);"><i class="bi bi-hourglass-split me-2"></i>Pending Events</h4>
+            </div>
+            @if (!Model.PendingEvents.Any())
+            {
+                <div class="alert alert-info">No events pending your approval at this time.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle shadow-sm rounded-3 overflow-hidden">
+                        <thead style="background: var(--light-yellow);">
+                            <tr>
+                                <th style="color: var(--green);">Event Title</th>
+                                <th style="color: var(--green);">Client</th>
+                                <th style="color: var(--green);">Date Sent</th>
+                                <th style="color: var(--green);">Status</th>
+                                <th style="color: var(--green);">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ev in Model.PendingEvents)
+                            {
+                                var latestProposalDate = ev.Proposals?.OrderByDescending(p => p.SubmittedAt).FirstOrDefault()?.SubmittedAt;
+                                <tr>
+                                    <td class="fw-semibold">@ev.Title</td>
+                                    <td>@(ev.Client != null ? ev.Client.Username : "Unknown")</td>
+                                    <td>@(latestProposalDate?.ToString("g") ?? "-")</td>
+                                    <td><span class="badge bg-warning text-dark">Sent to President</span></td>
+                                    <td>
+                                        <a href="@Url.Action("PresidentEventDetails", "EventProposals", new { id = ev.EventId })" class="btn btn-sm btn-custom"><i class="bi bi-eye"></i> View</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- Approved Events Section -->
+        <div class="mb-5">
+            <div class="d-flex align-items-center mb-3">
+                <h4 class="fw-semibold mb-0" style="color: var(--green);"><i class="bi bi-check-circle me-2"></i>Approved Events</h4>
+            </div>
+            @if (!Model.ApprovedEvents.Any())
+            {
+                <div class="alert alert-info">No events have been approved yet.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle shadow-sm rounded-3 overflow-hidden">
+                        <thead style="background: var(--green); background: var(--green); color: #fff;">
+                            <tr>
+                                <th>Event Title</th>
+                                <th>Client</th>
+                                <th>Date Approved</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ev in Model.ApprovedEvents)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@ev.Title</td>
+                                    <td>@(ev.Client != null ? ev.Client.Username : "Unknown")</td>
+                                    <td>@(ev.ApprovedDate.HasValue ? ev.ApprovedDate.Value.ToString("g") : "-")</td>
+                                    <td><span class="badge bg-success">Approved by President</span></td>
+                                    <td>
+                                        <a href="@Url.Action("PresidentEventDetails", "EventProposals", new { id = ev.EventId })" class="btn btn-sm btn-custom"><i class="bi bi-eye"></i> View</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- Recent Activity Section (empty for now) -->
+        <div class="mb-5">
+            <div class="d-flex align-items-center mb-3">
+                <h4 class="fw-semibold mb-0" style="color: var(--green);"><i class="bi bi-activity me-2"></i>Recent Activity</h4>
+            </div>
+            <div class="alert alert-light border">No recent activity to display.</div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastEl = document.getElementById('feedbackToast');
+            if (toastEl) {
+                var toast = new bootstrap.Toast(toastEl, { delay: 2000 });
+                toast.show();
+            }
+        });
+    </script>
 }

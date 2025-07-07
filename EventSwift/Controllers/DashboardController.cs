@@ -150,8 +150,10 @@ namespace EventSwift.Controllers
               .Take(5)
               .Select(pa => new ProposalSummaryVM
               {
+                  ProposalApprovalId = pa.ProposalApprovalId,
                   EventProposalId = pa.EventProposal.EventProposalId,
                   Title = pa.EventProposal.Title,
+                  EventTitle = pa.EventProposal.Event.Title,
                   Status = pa.EventProposal.Status,
                   SubmittedAt = pa.EventProposal.SubmittedAt
 
@@ -179,7 +181,7 @@ namespace EventSwift.Controllers
 
                 // Get Events related to current user (via proposals or ClientId if applicable)
                 Events = db.Events
-                    .Where(e => e.ClientId == currentUser.UserId) // or other logic to get user’s events
+                    .Where(e => e.ClientId == currentUser.UserId) // or other logic to get user's events
                     .Select(e => new EventCalendarViewModel
                     {
                         Id = e.EventId,
@@ -193,17 +195,38 @@ namespace EventSwift.Controllers
             return View(dashboard);
         }
 
-
+        public class PresidentDashboardViewModel
+        {
+            public List<Event> PendingEvents { get; set; }
+            public List<Event> ApprovedEvents { get; set; }
+            public int PendingCount { get; set; }
+            public int ApprovedCount { get; set; }
+            public int TotalCount { get; set; }
+            public List<ActivityLog> RecentActivity { get; set; } // Will be empty for now
+        }
 
         public ActionResult PresidentDashboard()
         {
-            var eventsForApproval = db.Events
-                .Where(e => e.Status == "SentToPresident")
-                .ToList();
+            var pendingEvents = db.Events.Include(e => e.Client).Include(e => e.Proposals).Where(e => e.Status == "SentToPresident").ToList();
+            var approvedEvents = db.Events.Include(e => e.Client).Include(e => e.Proposals).Where(e => e.Status == "ApprovedByPresident").ToList();
+            var totalEvents = db.Events.Count();
 
-            return View(eventsForApproval);
+            // No activity logging yet, so this will be empty
+            var recentActivity = new List<ActivityLog>();
+
+            var model = new PresidentDashboardViewModel
+            {
+                PendingEvents = pendingEvents,
+                ApprovedEvents = approvedEvents,
+                PendingCount = pendingEvents.Count,
+                ApprovedCount = approvedEvents.Count,
+                TotalCount = totalEvents,
+                RecentActivity = recentActivity
+            };
+            return View(model);
         }
 
     }
 }
+
 

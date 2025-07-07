@@ -4,33 +4,58 @@
     ViewBag.Title = "Login";
 }
 
-<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%; border: 1px solid #ddd;">
-        <div class="text-center mb-4">
-            <img src="~/Content/Images/eventswift_logo.png" alt="EventSwift Logo" style="height: 50px;" />
-            <h4 class="mt-2" style="color: var(--green);">Event Swift Login</h4>
-        </div>
-
-        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
-        {
-            <div class="mb-3">
-                @Html.LabelFor(m => m.Username, new { @class = "form-label" })
-                @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-sm", placeholder = "Enter username" })
-            </div>
-
-            <div class="mb-3">
-                @Html.LabelFor(m => m.Password, new { @class = "form-label" })
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-sm", placeholder = "Enter password" })
-            </div>
-
-            <button type="submit" class="btn w-100 text-white" style="background-color: var(--green);">Login</button>
-        }
-
-        @if (ViewBag.Error != null)
-        {
-            <div class="alert alert-danger mt-3 text-center p-2" style="font-size: 0.85rem;">
-                @ViewBag.Error
-            </div>
-        }
-    </div>
+<div class="text-center mb-4">
+    <img src="~/Content/Images/eventswift_logo.png" alt="EventSwift Logo" style="height: 56px;" class="mb-2" />
+    <h4 class="mt-2 mb-0 fw-bold" style="color: var(--green); font-family: 'Inter', Arial, sans-serif; letter-spacing: 1px;">Event Swift Login</h4>
 </div>
+
+@if (ViewBag.Error != null)
+{
+    <div aria-live="polite" aria-atomic="true" class="toast-container position-fixed end-0 p-3" style="z-index: 2000; bottom: 80px;">
+        <div class="toast show align-items-center custom-toast border-0 mb-2 animate__animated animate__slideInUp" role="alert" id="loginErrorToast">
+            <div class="d-flex">
+                <div class="toast-body text-center w-100">
+                    @ViewBag.Error
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+    <style>
+        .custom-toast {
+            background: #fff !important;
+            color: var(--brown) !important;
+            font-weight: 600;
+            border: 2px solid var(--orange) !important;
+            box-shadow: 0 4px 16px rgba(243, 167, 80, 0.10);
+        }
+        .custom-toast .btn-close {
+            filter: none;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script>
+        setTimeout(function() {
+            var toastEl = document.getElementById('loginErrorToast');
+            if (toastEl) {
+                var toast = bootstrap.Toast.getOrCreateInstance(toastEl);
+                toast.hide();
+            }
+        }, 4000);
+    </script>
+}
+
+@using (Html.BeginForm("Login", "Account", FormMethod.Post))
+{
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Username, new { @class = "form-label fw-semibold", style = "color: var(--green); font-size: 0.95rem;" })
+        @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-lg", placeholder = "Enter username", style = "border-radius: 0.35rem; font-size: 0.95rem;" })
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Password, new { @class = "form-label fw-semibold", style = "color: var(--green); font-size: 0.95rem;" })
+        @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-lg", placeholder = "Enter password", style = "border-radius: 0.35rem; font-size: 0.95rem;" })
+    </div>
+
+    <button type="submit" class="btn btn-custom w-100 mt-2">Login</button>
+}

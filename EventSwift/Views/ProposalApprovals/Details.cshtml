@@ -6,86 +6,299 @@
 
     var fileName = System.IO.Path.GetFileName(Model.EventProposal.FilePath);
     var fileExt = System.IO.Path.GetExtension(fileName)?.ToLower();
+    
+    // Get current user role directly from database
+    var currentUserRole = "";
+    if (User.Identity.IsAuthenticated)
+    {
+        using (var db = new EventSwift.Models.DefaultConnection())
+        {
+            var user = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
+            currentUserRole = user?.Role ?? "";
+        }
+    }
+    var isVPA = currentUserRole == "VPA";
 }
 
 <div class="d-flex">
     @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
 
-    <div class="flex-grow-1 p-2">
+    <div class="flex-grow-1 p-4">
         @Html.Partial("~/Views/Shared/_Navbar.cshtml")
 
-        <h2 class="mb-4" style="color: var(--green);">Approval Details</h2>
+        <!-- Section Header -->
+        <div class="d-flex align-items-center mb-4">
+            <div class="border-start border-3 ps-3 me-3" style="border-left-color: var(--green) !important;">
+                <h2 class="mb-0" style="color: var(--green); font-weight: 600;">
+                    <i class="bi bi-file-earmark-check me-2"></i>Approval Details
+                </h2>
+                <small class="text-muted">Review and take action on this proposal</small>
+            </div>
+        </div>
 
-        <!-- Two columns layout -->
-        <div class="d-flex gap-4">
-            <!-- Left Side: Details -->
-            <div style="flex: 1; min-width: 0;">
-                <dl class="row">
-                    <dt class="col-sm-4">Proposal Title</dt>
-                    <dd class="col-sm-8">@Model.EventProposal.Title</dd>
+        <div class="row g-4">
+            <!-- Proposal Details Card -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
+                        <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
+                            <i class="bi bi-info-circle me-2"></i>Proposal Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Proposal Title</dt>
+                            <dd class="col-sm-7 fw-semibold">@Model.EventProposal.Title</dd>
+                            <dt class="col-sm-5">Proposal Status</dt>
+                            <dd class="col-sm-7">
+                                @if (Model.EventProposal.Status == "Approved")
+                                {
+                                    <span class="badge" style="background: var(--green); color: #fff;">Approved</span>
+                                }
+                                else if (Model.EventProposal.Status == "Pending")
+                                {
+                                    <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
+                                }
+                                else if (Model.EventProposal.Status == "Rejected")
+                                {
+                                    <span class="badge" style="background: var(--brown); color: #fff;">Rejected</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@Model.EventProposal.Status</span>
+                                }
+                            </dd>
+                            <dt class="col-sm-5">Submitted At</dt>
+                            <dd class="col-sm-7">@Model.EventProposal.SubmittedAt.ToString("g")</dd>
+                            <dt class="col-sm-5">Approval Office</dt>
+                            <dd class="col-sm-7">@Model.Office</dd>
+                            <dt class="col-sm-5">Approval Status</dt>
+                            <dd class="col-sm-7">
+                                @if (Model.Status == "Approved")
+                                {
+                                    <span class="badge" style="background: var(--green); color: #fff;">Approved</span>
+                                }
+                                else if (Model.Status == "Pending")
+                                {
+                                    <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
+                                }
+                                else if (Model.Status == "Rejected")
+                                {
+                                    <span class="badge" style="background: var(--brown); color: #fff;">Rejected</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@Model.Status</span>
+                                }
+                            </dd>
+                            <dt class="col-sm-5">Action Date</dt>
+                            <dd class="col-sm-7">@((Model.ActionDate.HasValue) ? Model.ActionDate.Value.ToString("g") : "Pending")</dd>
+                            <dt class="col-sm-5">Proposal File</dt>
+                            <dd class="col-sm-7">
+                                <a href="@Url.Content(Model.EventProposal.FilePath)" target="_blank" class="btn btn-sm btn-outline-custom me-2 mb-1"><i class="bi bi-eye"></i> View</a>
+                                <a href="@Url.Content(Model.EventProposal.FilePath)" download class="btn btn-sm btn-outline-custom mb-1"><i class="bi bi-download"></i> Download</a>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
 
-                    <dt class="col-sm-4">Proposal Status</dt>
-                    <dd class="col-sm-8">@Model.EventProposal.Status</dd>
+                <!-- Approve/Reject Form -->
+                @if (Model.Status == "Pending" || Model.Status == "Resubmitted")
+                {
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
+                            <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
+                                <i class="bi bi-check2-square me-2"></i>Take Action
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @if (isVPA)
+                            {
+                                <div class="alert alert-info mb-3">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    <strong>VPA Approval:</strong> You must select an event date when approving this proposal. Click "Approve" to open the date selection calendar.
+                                </div>
+                            }
 
-                    <dt class="col-sm-4">Submitted At</dt>
-                    <dd class="col-sm-8">@Model.EventProposal.SubmittedAt.ToString("g")</dd>
+                            @using (Html.BeginForm("Action", "ProposalApprovals", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.ProposalApprovalId" />
+                                <input type="hidden" name="eventDate" id="selectedEventDate" />
 
-                    <dt class="col-sm-4">Approval Office</dt>
-                    <dd class="col-sm-8">@Model.Office</dd>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" value="" id="rejectToggle" />
+                                    <label class="form-check-label" for="rejectToggle">
+                                        I want to reject this proposal and provide feedback
+                                    </label>
+                                </div>
 
-                    <dt class="col-sm-4">Approval Status</dt>
-                    <dd class="col-sm-8">@Model.Status</dd>
+                                <div class="mb-3" id="feedbackContainer" style="display:none;">
+                                    <label for="feedbackMessage" class="form-label">Feedback for rejection:</label>
+                                    <textarea class="form-control" id="feedbackMessage" name="feedbackMessage" rows="4"></textarea>
+                                    @Html.ValidationMessage("feedbackMessage", "", new { @class = "text-danger" })
+                                </div>
 
-                    <dt class="col-sm-4">Action Date</dt>
-                    <dd class="col-sm-8">@((Model.ActionDate.HasValue) ? Model.ActionDate.Value.ToString("g") : "Pending")</dd>
-
-                    <dt class="col-sm-4">Proposal File</dt>
-                    <dd class="col-sm-8">
-                        <a href="@Url.Content(Model.EventProposal.FilePath)" target="_blank">View File</a> |
-                        <a href="@Url.Content(Model.EventProposal.FilePath)" download>Download File</a>
-                    </dd>
-                </dl>
-
-                @Html.ActionLink("Back to List", "ApprovalsIndex", null, new { @class = "btn btn-secondary" })
+                                if (isVPA)
+                                {
+                                    <button type="button" id="approveBtn" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#dateSelectionModal">
+                                        <i class="bi bi-check-circle me-1"></i>Approve
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit" id="approveBtn" class="btn btn-success me-2" name="action" value="Approve">
+                                        <i class="bi bi-check-circle me-1"></i>Approve
+                                    </button>
+                                }
+                                <button type="submit" id="rejectBtn" class="btn btn-danger" name="action" value="Reject"><i class="bi bi-x-circle me-1"></i>Reject</button>
+                                @Html.ActionLink("Cancel", "ApprovalsIndex", null, new { @class = "btn btn-outline-custom ms-2" })
+                            }
+                        </div>
+                    </div>
+                }
             </div>
 
-            <!-- Right Side: File Preview -->
-            <div style="flex: 1; min-width: 0;">
-                <h5 class="mb-3">File Preview</h5>
-
-                @if (fileExt == ".txt")
-                {
-                    string fullPath = Server.MapPath(Model.EventProposal.FilePath);
-                    string fileContent = System.IO.File.Exists(fullPath) ? System.IO.File.ReadAllText(fullPath) : "File not found.";
-
-                    <pre style="background-color:#f8f9fa; border: 1px solid #ddd; padding: 10px; max-height: 500px; overflow-y: auto;">
-@fileContent
-                    </pre>
-                }
-                else if (fileExt == ".doc" || fileExt == ".docx")
-                {
-                    <p>Preview not available for Word documents.</p>
-                    <a href="@Url.Content(Model.EventProposal.FilePath)" class="btn btn-primary mb-3" target="_blank">Download @fileName</a>
-
-                    <hr />
-                    <p>Or view online via Google Docs:</p>
-                    <iframe src="https://docs.google.com/gview?url=@(Request.Url.GetLeftPart(UriPartial.Authority) + Url.Content(Model.EventProposal.FilePath))&embedded=true"
-                            style="width:100%; height:500px;" frameborder="0">
-                        Your browser does not support iframes.
-                    </iframe>
-                }
-                else if (fileExt == ".pdf")
-                {
-                    <iframe src="@Url.Content(Model.EventProposal.FilePath)" style="width: 100%; height: 500px;" frameborder="0">
-                        This browser does not support PDFs. Please download the file to view it:
-                        <a href="@Url.Content(Model.EventProposal.FilePath)">Download file</a>.
-                    </iframe>
-                }
-                else
-                {
-                    <p>No file uploaded or preview not available.</p>
-                }
+            <!-- File Preview Card -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
+                        <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
+                            <i class="bi bi-file-earmark-text me-2"></i>File Preview
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @if (fileExt == ".txt")
+                        {
+                            string fullPath = Server.MapPath(Model.EventProposal.FilePath);
+                            string fileContent = System.IO.File.Exists(fullPath) ? System.IO.File.ReadAllText(fullPath) : "File not found.";
+                            <pre style="background-color:#f8f9fa; border: 1px solid #ddd; padding: 10px; max-height: 500px; overflow-y: auto;">@fileContent</pre>
+                        }
+                        else if (fileExt == ".doc" || fileExt == ".docx")
+                        {
+                            <p>Preview not available for Word documents.</p>
+                            <a href="@Url.Content(Model.EventProposal.FilePath)" class="btn btn-primary mb-3" target="_blank">Download @fileName</a>
+                            <hr />
+                            <p>Or view online via Google Docs:</p>
+                            <iframe src="https://docs.google.com/gview?url=@(Request.Url.GetLeftPart(UriPartial.Authority) + Url.Content(Model.EventProposal.FilePath))&embedded=true"
+                                    style="width:100%; height:500px;" frameborder="0">
+                                Your browser does not support iframes.
+                            </iframe>
+                        }
+                        else if (fileExt == ".pdf")
+                        {
+                            <iframe src="@Url.Content(Model.EventProposal.FilePath)" style="width: 100%; height: 500px;" frameborder="0">
+                                This browser does not support PDFs. Please download the file to view it:
+                                <a href="@Url.Content(Model.EventProposal.FilePath)">Download file</a>.
+                            </iframe>
+                        }
+                        else
+                        {
+                            <p>No file uploaded or preview not available.</p>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Date Selection Modal for VPA -->
+@if (isVPA)
+{
+    <div class="modal fade" id="dateSelectionModal" tabindex="-1" aria-labelledby="dateSelectionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: var(--green); color: white;">
+                    <h5 class="modal-title" id="dateSelectionModalLabel">
+                        <i class="bi bi-calendar-event me-2"></i>Select Event Date
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <p class="mb-3">Please select the date for this event:</p>
+                        <div class="d-flex justify-content-center">
+                            <input type="date" class="form-control" id="modalEventDate" style="max-width: 250px;" required />
+                        </div>
+                        <div class="form-text mt-2">This date will be used for the event scheduling.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-success" id="confirmDateBtn">
+                        <i class="bi bi-check-circle me-1"></i> Confirm & Approve
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        const rejectToggle = document.getElementById('rejectToggle');
+        const feedbackContainer = document.getElementById('feedbackContainer');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const rejectBtn = document.getElementById('rejectBtn');
+        const approveBtn = document.getElementById('approveBtn');
+        const selectedEventDate = document.getElementById('selectedEventDate');
+        const modalEventDate = document.getElementById('modalEventDate');
+        const confirmDateBtn = document.getElementById('confirmDateBtn');
+        const isVPA = @(isVPA ? "true" : "false");
+
+        if (rejectToggle) {
+            rejectToggle.addEventListener('change', function () {
+                if (this.checked) {
+                    feedbackContainer.style.display = 'block';
+                } else {
+                    feedbackContainer.style.display = 'none';
+                    feedbackMessage.value = '';
+                }
+            });
+        }
+        if (rejectBtn) {
+            rejectBtn.addEventListener('click', function (e) {
+                if (!rejectToggle.checked) {
+                    e.preventDefault();
+                    alert('Please check "I want to reject" to provide feedback.');
+                    return;
+                }
+                if (feedbackMessage.value.trim() === '') {
+                    e.preventDefault();
+                    alert('Please provide feedback when rejecting.');
+                    feedbackMessage.focus();
+                }
+            });
+        }
+
+        // Handle date confirmation for VPA
+        if (isVPA && confirmDateBtn) {
+            confirmDateBtn.addEventListener('click', function () {
+                if (!modalEventDate.value) {
+                    alert('Please select an event date before approving.');
+                    modalEventDate.focus();
+                    return;
+                }
+
+                // Set the selected date in the hidden field
+                selectedEventDate.value = modalEventDate.value;
+                
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('dateSelectionModal'));
+                modal.hide();
+                
+                // Submit the form with approve action
+                const form = document.querySelector('form');
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'Approve';
+                form.appendChild(actionInput);
+                form.submit();
+            });
+        }
+    </script>
+}

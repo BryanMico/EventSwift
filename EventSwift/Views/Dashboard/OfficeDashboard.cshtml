@@ -11,75 +11,160 @@
 <div class="d-flex">
     @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
 
-    <div class="flex-grow-1 p-2">
+    <div class="flex-grow-1 p-4">
         @Html.Partial("~/Views/Shared/_Navbar.cshtml")
 
-        <h2 class="mb-4" style="color: var(--green);">Office Dashboard</h2>
+        <!-- Dashboard Header -->
+        <div class="d-flex align-items-center mb-4">
+            <div class="border-start border-3 ps-3 me-3" style="border-left-color: var(--green) !important;">
+                <h2 class="mb-0" style="color: var(--green); font-weight: 600;">
+                    <i class="bi bi-speedometer2 me-2"></i>Office Dashboard
+                </h2>
+                <small class="text-muted">Manage and review event proposals</small>
+            </div>
+        </div>
 
-        <div class="row">
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
             <div class="col-md-4 mb-3">
-                <div class="card text-white" style="background-color: var(--green);">
-                    <div class="card-body">
-                        <h5 class="card-title">Pending Proposals</h5>
-                        <p class="card-text display-6">@ViewBag.PendingProposals</p>
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex align-items-center justify-content-center mb-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; background: var(--green);">
+                                <i class="bi bi-clock-history text-white" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0 fw-bold" style="color: var(--green);">@ViewBag.PendingProposals</h3>
+                                <small class="text-muted">Pending</small>
+                            </div>
+                        </div>
+                        <h6 class="card-title mb-0" style="color: var(--green);">Pending Proposals</h6>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-3">
-                <div class="card text-white" style="background-color: var(--orange);">
-                    <div class="card-body">
-                        <h5 class="card-title">Approved Proposals</h5>
-                        <p class="card-text display-6">@ViewBag.ApprovedProposals</p>
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex align-items-center justify-content-center mb-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; background: var(--orange);">
+                                <i class="bi bi-check-circle text-white" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0 fw-bold" style="color: var(--orange);">@ViewBag.ApprovedProposals</h3>
+                                <small class="text-muted">Approved</small>
+                            </div>
+                        </div>
+                        <h6 class="card-title mb-0" style="color: var(--orange);">Approved Proposals</h6>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-3">
-                <div class="card text-white" style="background-color: var(--brown);">
-                    <div class="card-body">
-                        <h5 class="card-title">Rejected Proposals</h5>
-                        <p class="card-text display-6">@ViewBag.RejectedProposals</p>
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex align-items-center justify-content-center mb-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; background: var(--brown);">
+                                <i class="bi bi-x-circle text-white" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0 fw-bold" style="color: var(--brown);">@ViewBag.RejectedProposals</h3>
+                                <small class="text-muted">Rejected</small>
+                            </div>
+                        </div>
+                        <h6 class="card-title mb-0" style="color: var(--brown);">Rejected Proposals</h6>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card mt-4">
-            <div class="card-header" style="background-color: var(--blue); color: black;">
-                Recent Proposals
+        <!-- Recent Proposals Section -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
+                <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
+                    <i class="bi bi-file-earmark-text me-2"></i>Recent Proposals
+                </h5>
             </div>
-            <ul class="list-group list-group-flush">
+            <div class="card-body p-0">
                 @if (recentProposals != null && recentProposals.Any())
                 {
-                    foreach (var proposal in recentProposals)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                            <div>
-                                <a href="@Url.Action("Details", "EventProposals", new { id = proposal.EventProposalId })"
-                                   style="text-decoration:none; color: inherit; font-weight: 600; font-size: 1.05rem;">
-                                    @proposal.Title
-                                </a>
-                                <div class="text-muted small">
-                                    @* Format date nicely; assuming you added SubmittedAt property to ProposalSummaryVM *@
-                                    @((proposal.SubmittedAt != null) ? proposal.SubmittedAt.ToString("MMM dd, yyyy HH:mm") : "")
+                    <div class="list-group list-group-flush">
+                        @foreach (var proposal in recentProposals)
+                        {
+                            <div class="list-group-item border-0 py-3 px-4">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-file-earmark-text me-2" style="color: var(--green);"></i>
+                                            <h6 class="mb-0 fw-semibold">
+                                                <a href="@Url.Action("Details", "ProposalApprovals", new { id = proposal.ProposalApprovalId })"
+                                                   class="text-decoration-none" style="color: var(--green);">
+                                                    @proposal.Title
+                                                </a>
+                                            </h6>
+                                        </div>
+                                        <div class="d-flex align-items-center text-muted small mb-1">
+                                            <i class="bi bi-calendar-event me-1"></i>
+                                            <span><strong>Event:</strong> @proposal.EventTitle</span>
+                                        </div>
+                                        <div class="d-flex align-items-center text-muted small">
+                                            <i class="bi bi-clock me-1"></i>
+                                            <span>@((proposal.SubmittedAt != null) ? proposal.SubmittedAt.ToString("MMM dd, yyyy 'at' HH:mm") : "Date not available")</span>
+                                        </div>
+                                    </div>
+                                    <div class="ms-3">
+                                        <span class="badge rounded-pill px-3 py-2 fw-semibold
+                                            @(proposal.Status == "Pending" ? "bg-warning text-dark" :
+                                              proposal.Status == "Approved" ? "bg-success" :
+                                              proposal.Status == "Rejected" ? "bg-danger" : "bg-secondary")">
+                                            <i class="bi @(proposal.Status == "Pending" ? "bi-clock" : 
+                                                         proposal.Status == "Approved" ? "bi-check-circle" : 
+                                                         proposal.Status == "Rejected" ? "bi-x-circle" : "bi-question-circle") me-1"></i>
+                                            @proposal.Status
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            <span class="badge rounded-pill
-                        @(proposal.Status == "Pending" ? "bg-warning text-dark" :
-                          proposal.Status == "Approved" ? "bg-success" :
-                          proposal.Status == "Rejected" ? "bg-danger" : "bg-secondary")"
-                                  style="min-width: 90px; text-align: center; font-weight: 600;">
-                                @proposal.Status
-                            </span>
-                        </li>
-                    }
+                        }
+                    </div>
                 }
                 else
                 {
-                    <li class="list-group-item text-muted text-center">No recent proposals.</li>
+                    <div class="text-center py-5">
+                        <i class="bi bi-file-earmark-x" style="font-size: 3rem; color: var(--orange);"></i>
+                        <h5 class="mt-3 mb-2" style="color: var(--green);">No Recent Proposals</h5>
+                        <p class="text-muted mb-0">No proposals have been submitted yet.</p>
+                    </div>
                 }
-            </ul>
+            </div>
         </div>
 
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
+                        <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
+                            <i class="bi bi-lightning me-2"></i>Quick Actions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <a href="@Url.Action("ApprovalsIndex", "ProposalApprovals")" class="btn btn-custom w-100 d-flex align-items-center justify-content-center gap-2 py-3">
+                                    <i class="bi bi-folder-check"></i>
+                                    <span>Review All Proposals</span>
+                                </a>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <a href="@Url.Action("Index", "Notifications")" class="btn btn-outline-custom w-100 d-flex align-items-center justify-content-center gap-2 py-3">
+                                    <i class="bi bi-bell"></i>
+                                    <span>View Notifications</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 </div>

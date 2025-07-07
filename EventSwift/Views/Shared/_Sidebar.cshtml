@@ -9,38 +9,56 @@
     }
 }
 
-<div class="d-flex flex-column flex-shrink-0 p-3" style="width: 250px; min-height: 100vh; background-color: var(--light-yellow);">
+<div class="d-flex flex-column flex-shrink-0 p-3" style="width: 250px; min-height: 100vh; background-color: var(--light-yellow); border-right: 2px solid var(--orange);">
     <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
         <img src="~/Content/Images/eventswift_logo.png" alt="Logo" style="height: 40px;" class="me-2" />
-        <span class="fs-5" style="color: var(--green); font-weight: bold;">EventSwift</span>
+        <span class="fs-5 sidebar-title" style="color: var(--green); font-weight: bold;">EventSwift</span>
     </a>
     <hr />
     <ul class="nav nav-pills flex-column mb-auto">
         @if (role == "SuperAdmin")
         {
             <li class="nav-item mb-2">
-                @Html.ActionLink("Analytics", "SuperAdminDashboard", "Dashboard", null, new { @class = "nav-link text-dark" })
+                <a href="@Url.Action("SuperAdminDashboard", "Dashboard")" class="nav-link text-dark d-flex align-items-center" title="Analytics">
+                    <i class="bi bi-bar-chart sidebar-icon"></i>
+                    <span>Analytics</span>
+                </a>
             </li>
             <li class="nav-item mb-2">
-                @Html.ActionLink("Manage Users", "Index", "Users", null, new { @class = "nav-link text-dark" })
+                <a href="@Url.Action("Index", "Users")" class="nav-link text-dark d-flex align-items-center" title="Manage Users">
+                    <i class="bi bi-people sidebar-icon"></i>
+                    <span>Manage Users</span>
+                </a>
             </li>
         }
         else if (role == "Client")
         {
             <li class="nav-item mb-2">
-                @Html.ActionLink("Dashboard", "ClientDashboard", "Dashboard", null, new { @class = "nav-link text-dark" })
+                <a href="@Url.Action("ClientDashboard", "Dashboard")" class="nav-link text-dark d-flex align-items-center" title="Dashboard">
+                    <i class="bi bi-speedometer2 sidebar-icon"></i>
+                    <span>Dashboard</span>
+                </a>
             </li>
             <li class="nav-item mb-2">
-                @Html.ActionLink("My Proposals", "Index", "EventProposals", null, new { @class = "nav-link text-dark" })
+                <a href="@Url.Action("Index", "EventProposals")" class="nav-link text-dark d-flex align-items-center" title="My Events">
+                    <i class="bi bi-file-earmark-text sidebar-icon"></i>
+                    <span>My Events</span>
+                </a>
             </li>
         }
-        else if (role == "VPAA" || role == "VPF" || role == "AMI" || role == "President")
+        else if (role == "VPAA" || role == "VPF" || role == "AMI" || role == "VPA" || role == "President")
         {
             <li class="nav-item mb-2">
-                @Html.ActionLink("Dashboard", "OfficeDashboard", "Dashboard", null, new { @class = "nav-link text-dark" })
+                <a href="@Url.Action("OfficeDashboard", "Dashboard")" class="nav-link text-dark d-flex align-items-center" title="Dashboard">
+                    <i class="bi bi-speedometer2 sidebar-icon"></i>
+                    <span>Dashboard</span>
+                </a>
             </li>
             <li class="nav-item mb-2">
-                @Html.ActionLink("Proposals", "ApprovalsIndex", "ProposalApprovals", null, new { @class = "nav-link text-dark" })
+                <a href="@Url.Action("ApprovalsIndex", "ProposalApprovals")" class="nav-link text-dark d-flex align-items-center" title="Events">
+                    <i class="bi bi-folder-check sidebar-icon"></i>
+                    <span>Events</span>
+                </a>
             </li>
         }
     </ul>

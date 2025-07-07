@@ -1,0 +1,18 @@
+@{
+    var icon = ViewData["Icon"] as string ?? "bi-info-circle";
+    var text = ViewData["Text"] as string ?? "Section";
+    var color = ViewData["Color"] as string ?? "var(--green)";
+    var status = ViewData["Status"] as string;
+}
+<div class="d-flex align-items-center mb-3 w-100">
+    <span class="p-1 px-2 rounded-3 w-100" style="background: #fff; color: @color; border: 2px solid @color; font-weight: 500; font-size: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="bi @icon me-2" style="font-size: 1.1em; color: @color;"></i>
+            @text
+        </div>
+        @if (!string.IsNullOrEmpty(status))
+        {
+            <span class="badge" style="background: @color; color: #fff; font-size: 0.85rem;">@status</span>
+        }
+    </span>
+</div> 

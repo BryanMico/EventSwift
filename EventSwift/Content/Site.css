@@ -6,49 +6,183 @@
     --light-brown: #d3ab6d;
 }
 
+body, html {
+    height: auto;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
 body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    font-size: 0.9rem; /* Smaller base font size */
-    overflow: hidden;
+    font-size: 0.92rem;
+    font-family: 'Inter', Arial, sans-serif;
+    overflow-x: hidden;
+    background: #f8f9fa;
 }
 
-main {
-    flex: 1;
+.bg-gradient-custom {
+    background: linear-gradient(135deg, #eeedc2 0%, #f3a750 100%);
+    min-height: 100vh;
+    height: auto;
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Only restrict scrolling and height for login page */
+.login-page-bg {
+    min-height: 100vh;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background: linear-gradient(135deg, #eeedc2 0%, #f3a750 100%) !important;
+}
+
+.main-area {
+    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.main-card {
+    box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.08);
+    border-radius: 1.1rem;
+    background: rgba(255,255,255,0.97);
+    transition: box-shadow 0.2s;
+    padding: 1rem 1rem;
+    margin: 0;
+    max-width: 380px;
+    width: 100%;
+}
+.main-card:hover {
+    box-shadow: 0 8px 24px 0 rgba(31, 38, 135, 0.13);
 }
 
 .navbar-custom {
-    background-color: var(--light-yellow);
+    background: rgba(255,255,255,0.95);
     padding-top: 0.1rem;
     padding-bottom: 0.1rem;
-    font-size: 0.9rem; /* Smaller navbar font */
+    font-size: 0.97rem;
+    border-radius: 1.1rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    border-bottom: 1.5px solid var(--orange);
+    margin-bottom: 0;
+}
+
+.brand-hover {
+    transition: color 0.2s, transform 0.2s;
+}
+.brand-hover:hover {
+    color: var(--orange) !important;
+    transform: scale(1.03);
 }
 
 .navbar-brand {
     font-weight: bold;
     color: var(--green) !important;
-    font-size: 1rem; /* Smaller brand text */
+    font-size: 1rem !important;
+    letter-spacing: 0.5px;
 }
 
 .nav-link {
     color: var(--green) !important;
     font-weight: 500;
-    font-size: 0.85rem; /* Smaller nav link text */
-    padding: 0.4rem 0.6rem; /* Smaller nav link spacing */
+    font-size: 0.97rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 0.4rem;
+    transition: background 0.2s, color 0.2s;
+}
+.nav-link:hover {
+    color: var(--orange) !important;
+    background: rgba(243, 167, 80, 0.08);
 }
 
-    .nav-link:hover {
-        color: var(--orange) !important;
-    }
-
 footer {
-    background-color: var(--light-brown);
+    background: var(--brown);
     color: white;
-    font-size: 0.85rem; /* Smaller footer text */
-    padding: 0.1rem 0; /* Compact footer padding */
+    font-size: 0.97rem;
+    padding: 0.4rem 0 0.2rem 0;
+    border-top: 2px solid var(--orange);
+    box-shadow: 0 -1px 4px rgba(0,0,0,0.03);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    margin: 0;
+    border-radius: 0;
+}
+.footer-enhanced a {
+    color: #fff;
+    font-size: 1.1rem;
+    margin: 0 0.3rem;
+    transition: color 0.2s;
+}
+.footer-enhanced a:hover {
+    color: var(--orange);
 }
 
 header img {
-    height: 40px !important; /* Smaller logo size */
+    height: 32px !important;
+}
+
+/* Button Styles */
+.btn-custom {
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+.btn-custom:hover, .btn-custom:focus {
+    background: var(--orange);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(243, 167, 80, 0.10);
+}
+
+/* Login form tweaks */
+.main-card .form-label {
+    font-size: 0.95rem !important;
+    margin-bottom: 0.15rem;
+}
+.main-card .form-control-lg {
+    font-size: 0.95rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.35rem;
+}
+.main-card .mb-3 {
+    margin-bottom: 0.5rem !important;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .main-card {
+        padding: 0.5rem 0.2rem;
+        max-width: 98vw;
+    }
+    .navbar-custom {
+        margin: 0;
+        border-radius: 0.7rem;
+    }
+    .footer-enhanced {
+        font-size: 0.93rem;
+        padding: 0.2rem 0 0.1rem 0;
+    }
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-size: 1.1em;
+}
+.sidebar-icon {
+    font-size: 1.15em;
+    margin-right: 0.5em;
+    vertical-align: middle;
 }

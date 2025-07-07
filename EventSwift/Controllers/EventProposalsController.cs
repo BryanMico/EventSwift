@@ -470,5 +470,36 @@ namespace EventSwift.Controllers
             return RedirectToAction("Details", new { id = proposal.EventId });
         }
 
+        public ActionResult PresidentEventDetails(int id)
+        {
+            var ev = db.Events.Include("Client").Include("Proposals").FirstOrDefault(e => e.EventId == id);
+            if (ev == null) return HttpNotFound();
+            return View("PresidentEventDetails", ev);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult PresidentApprove(int eventId)
+        {
+            var ev = db.Events.FirstOrDefault(e => e.EventId == eventId);
+            if (ev == null) return HttpNotFound();
+            ev.Status = "ApprovedByPresident";
+            db.SaveChanges();
+            TempData["Success"] = "Event approved by President.";
+            return RedirectToAction("PresidentDashboard", "Dashboard");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult PresidentReject(int eventId)
+        {
+            var ev = db.Events.FirstOrDefault(e => e.EventId == eventId);
+            if (ev == null) return HttpNotFound();
+            ev.Status = "RejectedByPresident";
+            db.SaveChanges();
+            TempData["Success"] = "Event rejected by President.";
+            return RedirectToAction("PresidentDashboard", "Dashboard");
+        }
+
     }
 }

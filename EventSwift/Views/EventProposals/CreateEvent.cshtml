@@ -5,26 +5,24 @@
     ViewBag.SkipNavbar = true;
 }
 
-<div class="d-flex">
-    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+@Html.Partial("~/Views/Shared/_SectionHeader.cshtml", new ViewDataDictionary { { "Icon", "bi-plus-circle" }, { "Text", "Create New Event" }, { "Color", "var(--green)" } })
 
-    <div class="flex-grow-1 p-2">
-        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
-
-        <h2 class="mb-4" style="color: var(--green);">Create New Event</h2>
-
+<div class="card shadow-sm border-0" style="max-width: 500px; margin: 0 auto;">
+    <div class="card-body">
         @using (Html.BeginForm("CreateEvent", "EventProposals", FormMethod.Post))
         {
             @Html.AntiForgeryToken()
 
             <div class="mb-3">
-                @Html.LabelFor(model => model.Title)
+                <label class="form-label fw-semibold" style="color: var(--green);" for="Title">
+                    <i class="bi bi-type me-1"></i> Event Title
+                </label>
                 @Html.TextBoxFor(model => model.Title, new { @class = "form-control", placeholder = "Enter event title" })
                 @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
             </div>
 
-            <button type="submit" class="btn text-white" style="background-color: var(--green);">
-                Create Event
+            <button type="submit" class="btn btn-custom w-100 d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-plus-circle"></i> Create Event
             </button>
         }
     </div>

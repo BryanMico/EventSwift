@@ -3,7 +3,7 @@
     var notifications = ViewBag.Notifications as List<EventSwift.Models.Notification> ?? new List<EventSwift.Models.Notification>();
 }
 
-<nav class="navbar navbar-expand-lg navbar-light mb-4 shadow-sm" style="background-color: var(--light-yellow);">
+<nav class="navbar navbar-expand-lg custom-navbar mb-4 shadow-sm" style="background-color: var(--light-yellow); border-bottom: 2px solid var(--orange);">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h5" style="color: var(--green); font-weight: bold;">
             @(role == "SuperAdmin" ? "Super Admin Panel" :

@@ -21,123 +21,151 @@
 
 <div class="d-flex">
     @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
-
     <div class="flex-grow-1 p-2">
         @Html.Partial("~/Views/Shared/_Navbar.cshtml")
 
-        <!-- Alerts at the top -->
-        @if (TempData["Error"] != null)
+        @if (TempData["Error"] != null || TempData["Success"] != null)
         {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert" id="autoDismissAlert">
-                @TempData["Error"]
+            <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+                <div class="toast align-items-center text-bg-@(TempData["Error"] != null ? "danger" : "success") border-0 show" role="alert" id="feedbackToast">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            @(TempData["Error"] ?? TempData["Success"])
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
             </div>
         }
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert" id="autoDismissAlert">
-                @TempData["Success"]
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <a href="@Url.Action("Index", "EventProposals")" class="btn btn-link" style="color: var(--green); text-decoration: none; font-weight: 500;"><i class="bi bi-arrow-left me-1"></i> Back to My Events</a>
+            @if (Model.Status != "SentToPresident" && Model.Status != "ApprovedByPresident")
+            {
+                var canSend = allVPAAApproved && allVPFApproved && allAMIApproved && allVPAApproved;
+                <button type="button" class="btn btn-warning d-flex align-items-center gap-2" style="min-width: 200px;" @(canSend ? "data-bs-toggle=modal data-bs-target=#sendToPresidentModal" : "disabled data-bs-toggle=tooltip title=All offices must approve before sending to President")>
+                    <i class="bi @(canSend ? "bi-send" : "bi-lock")"></i> Send to President
+                </button>
+            }
+            else if (Model.Status == "SentToPresident")
+            {
+                <span class="badge bg-warning text-dark">Sent to President</span>
+            }
+            else if (Model.Status == "ApprovedByPresident")
+            {
+                <span class="badge bg-success">Approved by President</span>
+            }
+        </div>
+        @Html.Partial("~/Views/Shared/_SectionHeader.cshtml", new ViewDataDictionary { { "Icon", "bi-calendar-event" }, { "Text", $"Event: {Model.Title}" }, { "Color", "var(--green)" }, { "Status", Model.Status } })
+
+        <div>
+            <h5 class="mb-2" style="color: var(--green); font-weight: 600;"><i class="bi bi-patch-check me-2"></i>Event Approval Status</h5>
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <span data-bs-toggle="tooltip" title="VPAA Approval">
+                    <i class="bi bi-person-circle" style="color: @(allVPAAApproved ? "#28a745" : "#dc3545"); font-size: 1.5em;"></i>
+                    <span class="ms-1">VPAA</span>
+                    <i class="bi @(allVPAAApproved ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") ms-1"></i>
+                </span>
+                <span data-bs-toggle="tooltip" title="VPF Approval">
+                    <i class="bi bi-person-circle" style="color: @(allVPFApproved ? "#28a745" : "#dc3545"); font-size: 1.5em;"></i>
+                    <span class="ms-1">VPF</span>
+                    <i class="bi @(allVPFApproved ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") ms-1"></i>
+                </span>
+                <span data-bs-toggle="tooltip" title="AMI Approval">
+                    <i class="bi bi-person-circle" style="color: @(allAMIApproved ? "#28a745" : "#dc3545"); font-size: 1.5em;"></i>
+                    <span class="ms-1">AMI</span>
+                    <i class="bi @(allAMIApproved ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") ms-1"></i>
+                </span>
+                <span data-bs-toggle="tooltip" title="VPA Approval">
+                    <i class="bi bi-person-circle" style="color: @(allVPAApproved ? "#28a745" : "#dc3545"); font-size: 1.5em;"></i>
+                    <span class="ms-1">VPA</span>
+                    <i class="bi @(allVPAApproved ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") ms-1"></i>
+                </span>
             </div>
-        }
+            <div class="progress mb-3" style="height: 1.2rem;">
+                <div class="progress-bar" role="progressbar" style="width: @(100 * (new[]{allVPAAApproved,allVPFApproved,allAMIApproved,allVPAApproved}.Count(x=>x))/4)% ; background: var(--green);" aria-valuenow="@(new[]{allVPAAApproved,allVPFApproved,allAMIApproved,allVPAApproved}.Count(x=>x))" aria-valuemin="0" aria-valuemax="4">
+                    @(new[]{allVPAAApproved,allVPFApproved,allAMIApproved,allVPAApproved}.Count(x=>x))/4 Approved
+                </div>
+            </div>
+        </div>
 
-        <h2 class="mb-4" style="color: var(--green);">Event: @Model.Title</h2>
-
-        <div class="d-flex justify-content-between mb-3">
-            <p>Status: @Model.Status</p>
-
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createProposalModal">
-                + Create Proposal
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <button type="button" class="btn btn-custom d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createProposalModal">
+                <i class="bi bi-plus-circle"></i> Create Proposal
             </button>
         </div>
 
         <hr />
 
-        <h4>Proposals</h4>
+        <h5 class="mb-3" style="color: var(--green); font-weight: 600;"><i class="bi bi-file-earmark-text me-2"></i>Proposals</h5>
 
         @if (Model.Proposals != null && Model.Proposals.Any())
         {
-            <table class="table table-bordered table-sm">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Status</th>
-                        <th>Submitted At</th>
-                        <th>Target Office</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var proposal in Model.Proposals)
-                    {
-                        <tr>
-                            <td>@proposal.Title</td>
-                            <td>@proposal.Status</td>
-                            <td>@proposal.SubmittedAt.ToString("g")</td>
-                            <td>@proposal.TargetOfficeRole</td>
-                            <td>
-                                <div class="d-flex">
-                                    @Html.ActionLink("Details", "DetailProposal", "EventProposals", new { id = proposal.EventProposalId }, new { @class = "btn btn-sm btn-primary me-1" })
-                                    @if (proposal.Status == "Rejected")
-                                    {
-                                        @Html.ActionLink("Resubmit", "Resubmit", "EventProposals", new { id = proposal.EventProposalId }, new { @class = "btn btn-sm btn-warning me-1" })
-                                    }
-                                    @if ((proposal.Status == "Pending" || proposal.Status == "Resubmitted") && !proposal.HasFollowedUp)
-                                    {
-                                        @Html.ActionLink("Follow Up", "FollowUp", "EventProposals", new { id = proposal.EventProposalId }, new { @class = "btn btn-sm btn-info me-1" })
-                                    }
-                                    else if ((proposal.Status == "Pending" || proposal.Status == "Resubmitted") && proposal.HasFollowedUp)
-                                    {
-                                        <button class="btn btn-sm btn-info me-1" disabled>Follow Up (Used)</button>
-                                    }
-                                    @using (Html.BeginForm("Delete", "EventProposals", FormMethod.Post, new { onsubmit = "return confirm('Are you sure you want to delete this proposal?');" }))
-                                    {
-                                        @Html.AntiForgeryToken()
-                                        @Html.Hidden("id", proposal.EventProposalId)
-                                    }
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background: var(--light-yellow);">
+                            <tr>
+                                <th style="color: var(--green);">Title</th>
+                                <th style="color: var(--green);">Status</th>
+                                <th style="color: var(--green);">Submitted At</th>
+                                <th style="color: var(--green);">Target Office</th>
+                                <th style="color: var(--green);">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var proposal in Model.Proposals)
+                            {
+                                <tr>
+                                    <td>@proposal.Title</td>
+                                    <td>
+                                        @if (proposal.Status == "Approved")
+                                        {
+                                            <span class="badge" style="background: var(--green); color: #fff;">Approved</span>
+                                        }
+                                        else if (proposal.Status == "Pending")
+                                        {
+                                            <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
+                                        }
+                                        else if (proposal.Status == "Rejected")
+                                        {
+                                            <span class="badge" style="background: var(--brown); color: #fff;">Rejected</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@proposal.Status</span>
+                                        }
+                                    </td>
+                                    <td>@proposal.SubmittedAt.ToString("g")</td>
+                                    <td>@proposal.TargetOfficeRole</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <a href="@Url.Action("DetailProposal", "EventProposals", new { id = proposal.EventProposalId })" class="btn btn-sm btn-custom"><i class="bi bi-eye me-1"></i> View</a>
+                                            @if (proposal.Status == "Rejected")
+                                            {
+                                                <a href="@Url.Action("Resubmit", "EventProposals", new { id = proposal.EventProposalId })" class="btn btn-sm btn-warning"><i class="bi bi-arrow-repeat me-1"></i> Resubmit</a>
+                                            }
+                                            @if ((proposal.Status == "Pending" || proposal.Status == "Resubmitted") && !proposal.HasFollowedUp)
+                                            {
+                                                <a href="@Url.Action("FollowUp", "EventProposals", new { id = proposal.EventProposalId })" class="btn btn-sm btn-info"><i class="bi bi-envelope-arrow-up me-1"></i> Follow Up</a>
+                                            }
+                                            else if ((proposal.Status == "Pending" || proposal.Status == "Resubmitted") && proposal.HasFollowedUp)
+                                            {
+                                                <button class="btn btn-sm btn-info" disabled><i class="bi bi-envelope-arrow-up me-1"></i> Follow Up (Used)</button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         }
         else
         {
             <p>No proposals submitted yet for this event.</p>
         }
-
-        <hr />
-
-        <div>
-            <h4>Event Approval Status</h4>
-            <p>
-                VPAA All Approved: @Html.Raw(allVPAAApproved ? "<span class=\"text-success\">Yes</span>" : "<span class=\"text-danger\">No</span>") |
-                VPF All Approved: @Html.Raw(allVPFApproved ? "<span class=\"text-success\">Yes</span>" : "<span class=\"text-danger\">No</span>") |
-                AMI All Approved: @Html.Raw(allAMIApproved ? "<span class=\"text-success\">Yes</span>" : "<span class=\"text-danger\">No</span>") |
-                VPA All Approved: @Html.Raw(allVPAApproved ? "<span class=\"text-success\">Yes</span>" : "<span class=\"text-danger\">No</span>")
-            </p>
-            @if (Model.Status == "SentToPresident")
-            {
-                <form asp-action="ApproveEvent" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="eventId" value="@Model.EventId" />
-                    <button type="submit" class="btn btn-success">President Approve Event</button>
-                </form>
-            }
-            else if (Model.Status == "ApprovedByPresident")
-            {
-                <span class="badge bg-success">Approved by President</span>
-
-            }
-            else
-            {
-                using (Html.BeginForm("SendToPresident", "EventProposals", FormMethod.Post, new { onsubmit = "return confirm('Are you sure you want to send this event to the President?');" }))
-                {
-                    @Html.AntiForgeryToken()
-                    @Html.Hidden("eventId", Model.EventId)
-                    <button type="submit" class="btn btn-warning">Send to President</button>
-                }
-            }
-        </div>
 
         <hr />
 
@@ -179,18 +207,49 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal for Send to President -->
+        <div class="modal fade" id="sendToPresidentModal" tabindex="-1" aria-labelledby="sendToPresidentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="sendToPresidentModalLabel"><i class="bi bi-send me-2"></i>Send to President</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    @using (Html.BeginForm("SendToPresident", "EventProposals", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("eventId", Model.EventId)
+                        <div class="modal-body">
+                            Are you sure you want to send this event to the President for approval?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-warning d-flex align-items-center gap-2"><i class="bi bi-send"></i> Confirm Send</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @section Scripts {
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script>
+                // Show toast if present
+                document.addEventListener('DOMContentLoaded', function() {
+                    var toastEl = document.getElementById('feedbackToast');
+                    if (toastEl) {
+                        var toast = new bootstrap.Toast(toastEl, { delay: 2000 });
+                        toast.show();
+                    }
+                });
+            </script>
+            <script>
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            </script>
+        }
     </div>
 </div>
-
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        setTimeout(function() {
-            var alert = document.getElementById('autoDismissAlert');
-            if (alert) {
-                var bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            }
-        }, 2000);
-    </script>
-}

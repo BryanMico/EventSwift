@@ -11,6 +11,21 @@ namespace EventSwift.Controllers
     {
         private DefaultConnection db = new DefaultConnection();
 
+        // GET: Notifications
+        public ActionResult Index()
+        {
+            if (!User.Identity.IsAuthenticated)
+                return RedirectToAction("Login", "Account");
+
+            var username = User.Identity.Name;
+            var notifications = db.Notifications
+                .Where(n => n.Username == username)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToList();
+
+            return View(notifications);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult MarkAllAsRead()

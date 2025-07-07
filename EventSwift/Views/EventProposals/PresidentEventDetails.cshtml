@@ -1,0 +1,133 @@
+@model EventSwift.Models.Event
+
+@{
+    ViewBag.Title = "Event Details - President";
+    ViewBag.SkipNavbar = true;
+}
+
+@if (TempData["Success"] != null || TempData["Error"] != null)
+{
+    <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+        <div class="toast align-items-center text-bg-@(TempData["Error"] != null ? "danger" : "success") border-0 show" role="alert" id="feedbackToast">
+            <div class="d-flex">
+                <div class="toast-body">
+                    @(TempData["Error"] ?? TempData["Success"])
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="d-flex flex-column min-vh-100">
+    @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+    <div class="container py-4 flex-grow-1">
+        <div class="mb-3">
+            <a href="@Url.Action("PresidentDashboard", "Dashboard")" class="btn btn-link" style="color: var(--green); text-decoration: none; font-weight: 500;"><i class="bi bi-arrow-left me-1"></i> Back to Dashboard</a>
+        </div>
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h3 class="fw-bold mb-2" style="color: var(--green);"><i class="bi bi-calendar-event me-2"></i>@Model.Title</h3>
+                <div class="mb-2">
+                    <span class="me-3"><i class="bi bi-person-circle me-1"></i> <strong>Client:</strong> @(Model.Client != null ? Model.Client.Username : "Unknown")</span>
+                    <span class="me-3"><i class="bi bi-info-circle me-1"></i> <strong>Status:</strong> <span class="badge @(Model.Status == "ApprovedByPresident" ? "bg-success" : Model.Status == "SentToPresident" ? "bg-warning text-dark" : "bg-secondary")">@Model.Status</span></span>
+                </div>
+                @if (Model.ApprovedDate.HasValue)
+                {
+                    <div class="mb-2">
+                        <span class="me-3"><i class="bi bi-calendar-check me-1"></i> <strong>Proposed Event Date:</strong> <span class="badge bg-info text-dark">@Model.ApprovedDate.Value.ToString("MMMM dd, yyyy")</span></span>
+                    </div>
+                }
+                @if (Model.Status == "SentToPresident")
+                {
+                    <div class="mt-3">
+                        <form action="@Url.Action("PresidentApprove", "EventProposals")" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="eventId" value="@Model.EventId" />
+                            <button type="submit" class="btn btn-success me-2" onclick="return confirm('Are you sure you want to approve this event?')">
+                                <i class="bi bi-check-circle me-1"></i> Approve Event
+                            </button>
+                        </form>
+                        <form action="@Url.Action("PresidentReject", "EventProposals")" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="eventId" value="@Model.EventId" />
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to reject this event?')">
+                                <i class="bi bi-x-circle me-1"></i> Reject Event
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <h5 class="mb-3" style="color: var(--green); font-weight: 600;"><i class="bi bi-file-earmark-text me-2"></i>Proposals</h5>
+            @if (Model.Proposals != null && Model.Proposals.Any())
+            {
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead style="background: var(--light-yellow);">
+                                <tr>
+                                    <th style="color: var(--green);">Title</th>
+                                    <th style="color: var(--green);">Status</th>
+                                    <th style="color: var(--green);">Submitted At</th>
+                                    <th style="color: var(--green);">Target Office</th>
+                                    <th style="color: var(--green);">File</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var proposal in Model.Proposals)
+                                {
+                                    <tr>
+                                        <td>@proposal.Title</td>
+                                        <td>
+                                            @if (proposal.Status == "Approved")
+                                            {
+                                                <span class="badge" style="background: var(--green); color: #fff;">Approved</span>
+                                            }
+                                            else if (proposal.Status == "Pending")
+                                            {
+                                                <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
+                                            }
+                                            else if (proposal.Status == "Rejected")
+                                            {
+                                                <span class="badge" style="background: var(--brown); color: #fff;">Rejected</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">@proposal.Status</span>
+                                            }
+                                        </td>
+                                        <td>@proposal.SubmittedAt.ToString("g")</td>
+                                        <td>@proposal.TargetOfficeRole</td>
+                                        <td>
+                                            <a href="@Url.Content(proposal.FilePath)" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-arrow-down"></i> View File</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">No proposals submitted yet for this event.</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastEl = document.getElementById('feedbackToast');
+            if (toastEl) {
+                var toast = new bootstrap.Toast(toastEl, { delay: 2000 });
+                toast.show();
+            }
+        });
+    </script>
+} 

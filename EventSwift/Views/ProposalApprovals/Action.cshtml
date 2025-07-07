@@ -11,40 +11,71 @@
     <div class="flex-grow-1 p-2">
         @Html.Partial("~/Views/Shared/_Navbar.cshtml")
 
-        <h2>Approve or Reject Proposal</h2>
+        <div class="mb-3">
+            <a href="@Url.Action("ApprovalsIndex", "ProposalApprovals")" class="btn btn-link" style="color: var(--green); text-decoration: none; font-weight: 500;"><i class="bi bi-arrow-left me-1"></i> Back to Approvals</a>
+        </div>
 
-        <dl class="row">
-            <dt class="col-sm-3">Title</dt>
-            <dd class="col-sm-9">@Model.EventProposal.Title</dd>
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h3 class="fw-bold mb-3" style="color: var(--green);"><i class="bi bi-file-earmark-check me-2"></i>Approve or Reject Proposal</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4 fw-semibold">Title</dt>
+                            <dd class="col-sm-8">@Model.EventProposal.Title</dd>
 
-            <dt class="col-sm-3">Status</dt>
-            <dd class="col-sm-9">@Model.EventProposal.Status</dd>
+                            <dt class="col-sm-4 fw-semibold">Status</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge @(Model.EventProposal.Status == "Approved" ? "bg-success" : Model.EventProposal.Status == "Pending" ? "bg-warning text-dark" : "bg-danger")">@Model.EventProposal.Status</span>
+                            </dd>
 
-            <dt class="col-sm-3">Submitted At</dt>
-            <dd class="col-sm-9">@Model.EventProposal.SubmittedAt.ToString("g")</dd>
-        </dl>
+                            <dt class="col-sm-4 fw-semibold">Submitted At</dt>
+                            <dd class="col-sm-8">@Model.EventProposal.SubmittedAt.ToString("g")</dd>
+
+                            <dt class="col-sm-4 fw-semibold">Target Office</dt>
+                            <dd class="col-sm-8">@Model.Office</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         @using (Html.BeginForm())
         {
             @Html.AntiForgeryToken()
             <input type="hidden" name="id" value="@Model.ProposalApprovalId" />
 
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" value="" id="rejectToggle" />
-                <label class="form-check-label" for="rejectToggle">
-                    I want to reject this proposal and provide feedback
-                </label>
-            </div>
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="mb-3" style="color: var(--green);"><i class="bi bi-check-circle me-2"></i>Approval Options</h5>
 
-            <div class="mb-3" id="feedbackContainer" style="display:none;">
-                <label for="feedbackMessage" class="form-label">Feedback for rejection:</label>
-                <textarea class="form-control" id="feedbackMessage" name="feedbackMessage" rows="4"></textarea>
-                @Html.ValidationMessage("feedbackMessage", "", new { @class = "text-danger" })
-            </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" value="" id="rejectToggle" />
+                        <label class="form-check-label fw-semibold" for="rejectToggle">
+                            <i class="bi bi-x-circle me-1"></i>I want to reject this proposal and provide feedback
+                        </label>
+                    </div>
 
-            <button type="submit" id="approveBtn" class="btn btn-success me-2" name="action" value="Approve">Approve</button>
-            <button type="submit" id="rejectBtn" class="btn btn-danger" name="action" value="Reject">Reject</button>
-            @Html.ActionLink("Cancel", "ApprovalsIndex", null, new { @class = "btn btn-secondary ms-2" })
+                    <div class="mb-3" id="feedbackContainer" style="display:none;">
+                        <label for="feedbackMessage" class="form-label fw-semibold"><i class="bi bi-chat-text me-1"></i>Feedback for rejection:</label>
+                        <textarea class="form-control" id="feedbackMessage" name="feedbackMessage" rows="4" placeholder="Please provide detailed feedback for the rejection..."></textarea>
+                        @Html.ValidationMessage("feedbackMessage", "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" id="approveBtn" class="btn btn-success d-flex align-items-center gap-2" name="action" value="Approve">
+                            <i class="bi bi-check-circle"></i> Approve
+                        </button>
+                        <button type="submit" id="rejectBtn" class="btn btn-danger d-flex align-items-center gap-2" name="action" value="Reject">
+                            <i class="bi bi-x-circle"></i> Reject
+                        </button>
+                        <a href="@Url.Action("ApprovalsIndex", "ProposalApprovals")" class="btn btn-secondary d-flex align-items-center gap-2">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
         }
     </div>
 </div>
@@ -62,7 +93,6 @@
                 feedbackContainer.style.display = 'block';
             } else {
                 feedbackContainer.style.display = 'none';
-                feedbackMessage.value = '';  // clear feedback when unchecked
             }
         });
 
