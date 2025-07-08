@@ -160,8 +160,6 @@ namespace EventSwift.Controllers
             return RedirectToAction("ApprovalsIndex");
         }
 
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult SendToOtherOffice(int proposalApprovalId, string targetOffice)
@@ -194,6 +192,78 @@ namespace EventSwift.Controllers
             db.SaveChanges();
 
             TempData["Message"] = $"Proposal sent to {targetOffice}.";
+            return RedirectToAction("ApprovalsIndex");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteEvent(int eventId)
+        {
+            var currentUser = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
+            if (currentUser == null)
+                return HttpNotFound("User not found");
+
+            var officeRole = currentUser.Role;
+
+            var ev = db.Events
+                .Include(e => e.Proposals.Select(p => p.Approvals))
+                .Include(e => e.Client)
+                .FirstOrDefault(e => e.EventId == eventId);
+
+            if (ev == null)
+            {
+                TempData["Error"] = "Event not found.";
+                return RedirectToAction("ApprovalsIndex");
+            }
+
+            // Check if this office has any proposals for this event
+            var officeProposals = ev.Proposals.Where(p => p.Approvals.Any(a => a.Office == officeRole)).ToList();
+            if (!officeProposals.Any())
+            {
+                TempData["Error"] = "You don't have permission to delete this event.";
+                return RedirectToAction("ApprovalsIndex");
+            }
+
+            // Delete all proposals for this office and their associated files
+            foreach (var proposal in officeProposals)
+            {
+                // Delete the file from server
+                if (!string.IsNullOrEmpty(proposal.FilePath))
+                {
+                    string fullPath = Server.MapPath(proposal.FilePath);
+                    if (System.IO.File.Exists(fullPath))
+                    {
+                        System.IO.File.Delete(fullPath);
+                    }
+                }
+
+                // Delete related feedbacks
+                var feedbacks = db.ProposalFeedbacks.Where(f => f.EventProposalId == proposal.EventProposalId).ToList();
+                db.ProposalFeedbacks.RemoveRange(feedbacks);
+
+                // Delete approvals for this proposal
+                var approvals = db.ProposalApprovals.Where(a => a.EventProposalId == proposal.EventProposalId).ToList();
+                db.ProposalApprovals.RemoveRange(approvals);
+
+                // Delete the proposal
+                db.EventProposals.Remove(proposal);
+            }
+
+            // Notify the client
+            if (ev.Client != null)
+            {
+                db.Notifications.Add(new Notification
+                {
+                    Username = ev.Client.Username,
+                    Message = $"Your event '{ev.Title}' has been deleted by {officeRole}.",
+                    IsRead = false,
+                    CreatedAt = DateTime.Now
+                });
+            }
+
+            db.SaveChanges();
+
+            TempData["Success"] = "Event and associated proposals deleted successfully.";
             return RedirectToAction("ApprovalsIndex");
         }
     }
