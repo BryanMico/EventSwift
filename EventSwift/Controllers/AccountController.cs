@@ -21,7 +21,7 @@ namespace EventSwift.Controllers
         public ActionResult Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
-            {
+            {   
                 ViewBag.Error = "Please fill in all required fields correctly.";
                 return View(model);
             }
@@ -42,7 +42,7 @@ namespace EventSwift.Controllers
 
                     case "VPAA":
                     case "VPF":
-                    case "AMI":
+                    case "AMU":
                     case "VPA":
                         return RedirectToAction("OfficeDashboard", "Dashboard");
 

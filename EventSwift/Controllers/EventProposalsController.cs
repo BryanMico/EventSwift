@@ -71,14 +71,20 @@ namespace EventSwift.Controllers
         {
             using (var db = new DefaultConnection())
             {
+                // Check if event has been sent to President
+                var eventItem = db.Events.FirstOrDefault(e => e.EventId == eventId);
+                if (eventItem != null && (eventItem.Status == "SentToPresident" || eventItem.Status == "ApprovedByPresident"))
+                {
+                    TempData["Error"] = "Cannot create new documents. This event has been sent to the President for approval.";
+                    return RedirectToAction("Details", new { id = eventId });
+                }
                 if (uploadedFile != null && uploadedFile.ContentLength > 0)
                 {
-                    string[] allowedExtensions = { ".pdf", ".docx", ".txt" };
                     string fileExtension = Path.GetExtension(uploadedFile.FileName).ToLower();
 
-                    if (!allowedExtensions.Contains(fileExtension))
+                    if (fileExtension != ".pdf")
                     {
-                        ModelState.AddModelError("uploadedFile", "Only PDF, DOCX, and TXT files are allowed.");
+                        ModelState.AddModelError("uploadedFile", "Only PDF files are allowed.");
                         return RedirectToAction("Details", new { id = eventId });
                     }
 
@@ -88,14 +94,19 @@ namespace EventSwift.Controllers
                         Directory.CreateDirectory(uploadFolder);
                     }
 
-                    string fileName = Path.GetFileName(uploadedFile.FileName);
-                    string path = Path.Combine(uploadFolder, fileName);
+                    string originalFileName = Path.GetFileName(uploadedFile.FileName);
+                    string fileNameWithoutExt = Path.GetFileNameWithoutExtension(originalFileName);
+                    string fileExt = Path.GetExtension(originalFileName);
+                    
+                    // Create unique filename for this proposal
+                    string uniqueFileName = $"{fileNameWithoutExt}_{eventId}_{DateTime.Now:yyyyMMddHHmmss}{fileExt}";
+                    string path = Path.Combine(uploadFolder, uniqueFileName);
                     uploadedFile.SaveAs(path);
-                    proposal.FilePath = "/Uploads/" + fileName;
+                    proposal.FilePath = "/Uploads/" + uniqueFileName;
                 }
                 else
                 {
-                    ModelState.AddModelError("uploadedFile", "Please select a file to upload.");
+                    ModelState.AddModelError("uploadedFile", "Please insert a file to upload.");
                     return RedirectToAction("Details", new { id = eventId });
                 }
 
@@ -158,18 +169,20 @@ namespace EventSwift.Controllers
 
             if (ev == null) return HttpNotFound();
 
-            var vpaaProposals = ev.Proposals.Where(p => p.TargetOfficeRole == "VPAA").ToList();
-            var vpfProposals = ev.Proposals.Where(p => p.TargetOfficeRole == "VPF").ToList();
-            var amiProposals = ev.Proposals.Where(p => p.TargetOfficeRole == "AMI").ToList();
-            var vpaProposals = ev.Proposals.Where(p => p.TargetOfficeRole == "VPA").ToList();
-            bool allVPAAApproved = vpaaProposals.Any() && vpaaProposals.All(p => p.Approvals.Any(a => a.Office == "VPAA" && a.Status == "Approved"));
-            bool allVPFApproved = vpfProposals.Any() && vpfProposals.All(p => p.Approvals.Any(a => a.Office == "VPF" && a.Status == "Approved"));
-            bool allAMIApproved = amiProposals.Any() && amiProposals.All(p => p.Approvals.Any(a => a.Office == "AMI" && a.Status == "Approved"));
-            bool allVPAApproved = vpaProposals.Any() && vpaProposals.All(p => p.Approvals.Any(a => a.Office == "VPA" && a.Status == "Approved"));
+            // Check if all submitted proposals are approved (don't require all offices to have proposals)
+            bool allProposalsApproved = ev.Proposals.Any() && ev.Proposals.All(p => p.Approvals.Any(a => a.Office == p.TargetOfficeRole && a.Status == "Approved"));
 
-            if (!(allVPAAApproved && allVPFApproved && allAMIApproved && allVPAApproved))
+            // Debug information
+            var debugProposals = ev.Proposals.Select(p => new { 
+                Title = p.Title, 
+                TargetOffice = p.TargetOfficeRole, 
+                Status = p.Status,
+                Approvals = p.Approvals.Select(a => new { Office = a.Office, Status = a.Status }).ToList()
+            }).ToList();
+
+            if (!allProposalsApproved)
             {
-                TempData["Error"] = "Cannot send to President. All proposals for VPAA, VPF, AMI, and VPA must be approved (and at least one proposal for each office must exist).";
+                TempData["Error"] = $"Cannot send to President. Debug: allProposalsApproved={allProposalsApproved}, Proposals: {string.Join(", ", debugProposals.Select(p => $"{p.Title}({p.TargetOffice}:{p.Status})"))}";
                 return RedirectToAction("Details", new { id = eventId });
             }
 
@@ -348,12 +361,11 @@ namespace EventSwift.Controllers
 
             if (uploadedFile != null && uploadedFile.ContentLength > 0)
             {
-                string[] allowedExtensions = { ".pdf", ".docx", ".txt" };
                 string fileExtension = Path.GetExtension(uploadedFile.FileName).ToLower();
 
-                if (!allowedExtensions.Contains(fileExtension))
+                if (fileExtension != ".pdf")
                 {
-                    ModelState.AddModelError("uploadedFile", "Only PDF, DOCX, and TXT files are allowed.");
+                    ModelState.AddModelError("uploadedFile", "Only PDF files are allowed.");
                     return View(proposal);
                 }
 
@@ -363,10 +375,15 @@ namespace EventSwift.Controllers
                     Directory.CreateDirectory(uploadFolder);
                 }
 
-                string fileName = Path.GetFileName(uploadedFile.FileName);
-                string path = Path.Combine(uploadFolder, fileName);
+                string originalFileName = Path.GetFileName(uploadedFile.FileName);
+                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(originalFileName);
+                string fileExt = Path.GetExtension(originalFileName);
+                
+                // Create unique filename for this resubmission
+                string uniqueFileName = $"{fileNameWithoutExt}_resubmit_{proposal.EventProposalId}_{DateTime.Now:yyyyMMddHHmmss}{fileExt}";
+                string path = Path.Combine(uploadFolder, uniqueFileName);
                 uploadedFile.SaveAs(path);
-                proposal.FilePath = "/Uploads/" + fileName;
+                proposal.FilePath = "/Uploads/" + uniqueFileName;
             }
             else
             {

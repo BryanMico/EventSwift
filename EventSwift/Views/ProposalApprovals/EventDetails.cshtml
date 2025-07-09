@@ -1,7 +1,7 @@
 @model IEnumerable<EventSwift.Models.EventProposal>
 
 @{
-    ViewBag.Title = "Proposals for Event: " + (ViewBag.EventTitle ?? "");
+    ViewBag.Title = "Documents for Event: " + (ViewBag.EventTitle ?? "");
     ViewBag.SkipNavbar = true;
     var role = ViewBag.Role as string ?? "";
 }
@@ -12,14 +12,14 @@
     <div class="flex-grow-1 p-4">
         @Html.Partial("~/Views/Shared/_Navbar.cshtml")
 
-        @Html.Partial("~/Views/Shared/_SectionHeader.cshtml", new ViewDataDictionary { { "Icon", "bi-calendar-event" }, { "Text", $"Proposals for Event: {ViewBag.EventTitle}" }, { "Color", "var(--green)" }, { "Status", ViewBag.EventStatus } })
+        @Html.Partial("~/Views/Shared/_SectionHeader.cshtml", new ViewDataDictionary { { "Icon", "bi-calendar-event" }, { "Text", $"Documents for Event: {ViewBag.EventTitle}" }, { "Color", "var(--green)" }, { "Status", ViewBag.EventStatus } })
 
         <a href="@Url.Action("ApprovalsIndex")" class="btn btn-outline-custom mb-3"><i class="bi bi-arrow-left me-1"></i>Back to Events</a>
 
         <div class="card shadow-sm border-0">
             <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
                 <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
-                    <i class="bi bi-file-earmark-text me-2"></i>Proposals List
+                    <i class="bi bi-file-earmark-text me-2"></i>Documents List
                 </h5>
             </div>
             <div class="card-body p-0">
@@ -27,8 +27,8 @@
                 {
                     <div class="text-center py-5">
                         <i class="bi bi-file-earmark-x" style="font-size: 3rem; color: var(--orange);"></i>
-                        <h5 class="mt-3 mb-2" style="color: var(--green);">No Proposals</h5>
-                        <p class="text-muted mb-0">There are currently no proposals for your office in this event.</p>
+                        <h5 class="mt-3 mb-2" style="color: var(--green);">No Documents</h5>
+<p class="text-muted mb-0">There are currently no documents for your office in this event.</p>
                     </div>
                 }
                 else
@@ -64,7 +64,7 @@
                                                 }
                                                 else if (approval.Status == "Rejected")
                                                 {
-                                                    <span class="badge" style="background: var(--brown); color: #fff;">Rejected</span>
+                                                    <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
                                                 }
                                                 else
                                                 {
@@ -80,15 +80,11 @@
                                         <td>
                                             @if (approval != null && (approval.Status == "Pending" || approval.Status == "Resubmitted"))
                                             {
-                                                <a href="@Url.Action("Details", "ProposalApprovals", new { id = approval.ProposalApprovalId })" class="btn btn-sm btn-custom px-3 d-inline-flex align-items-center gap-1 mb-1"><i class="bi bi-check2-square"></i> Take Action</a>
+                                                <a href="@Url.Action("Details", "ProposalApprovals", new { id = approval.ProposalApprovalId })" class="btn btn-sm btn-custom px-3 d-inline-flex align-items-center gap-1 mb-1"><i class="bi bi-check2-square"></i> Approve/Return</a>
                                             }
                                             else if (approval != null)
                                             {
                                                 <a href="@Url.Action("Details", "ProposalApprovals", new { id = approval.ProposalApprovalId })" class="btn btn-sm btn-outline-custom px-3 d-inline-flex align-items-center gap-1 mb-1"><i class="bi bi-eye"></i> View</a>
-                                            }
-                                            @if (approval != null && approval.Status == "Rejected")
-                                            {
-                                                <a href="@Url.Action("Resubmit", "EventProposals", new { id = proposal.EventProposalId })" class="btn btn-sm btn-warning d-inline-flex align-items-center gap-1 mb-1"><i class="bi bi-arrow-repeat"></i> Resubmit</a>
                                             }
                                         </td>
                                     </tr>

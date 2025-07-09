@@ -1,7 +1,7 @@
 ﻿@model EventSwift.Models.EventProposal
 
 @{
-    ViewBag.Title = "Resubmit Proposal";
+    ViewBag.Title = "Resubmit Document";
     ViewBag.SkipNavbar = true;
 }
 
@@ -11,7 +11,7 @@
     <div class="flex-grow-1 p-2">
         @Html.Partial("~/Views/Shared/_Navbar.cshtml")
 
-        <h2>Resubmit Proposal</h2>
+        <h2>Resubmit Document</h2>
 
         <p><strong>Title:</strong> @Model.Title</p>
         <p><strong>Status:</strong> @Model.Status</p>
@@ -34,12 +34,50 @@
         {
             @Html.AntiForgeryToken()
 
-            <label for="uploadedFile">Upload corrected proposal file:</label>
+            <label for="uploadedFile">Upload corrected document file:</label>
             <br />
-            <input type="file" name="uploadedFile" id="uploadedFile" />
+            <div class="custom-file-input">
+                <input type="file" name="uploadedFile" id="uploadedFile" accept=".pdf" required style="display: none;" />
+                <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('uploadedFile').click();">
+                    <i class="bi bi-file-earmark-arrow-up me-2"></i>Insert a File
+                </button>
+                <span id="file-name" class="ms-2 text-muted"></span>
+            </div>
             <br /><br />
 
-            <button type="submit" class="btn btn-primary">Resubmit</button>
+            <button type="submit" class="btn btn-primary">Resubmit Document</button>
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Custom file input handling
+            var fileInput = document.getElementById('uploadedFile');
+            var fileNameSpan = document.getElementById('file-name');
+            
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    if (this.files.length > 0) {
+                        var file = this.files[0];
+                        var fileName = file.name;
+                        var fileExtension = fileName.split('.').pop().toLowerCase();
+                        
+                        // Check if file is PDF
+                        if (fileExtension !== 'pdf') {
+                            alert('Only PDF files are allowed. Please select a PDF file.');
+                            this.value = ''; // Clear the file input
+                            fileNameSpan.textContent = '';
+                            return;
+                        }
+                        
+                        fileNameSpan.textContent = fileName;
+                    } else {
+                        fileNameSpan.textContent = '';
+                    }
+                });
+            }
+        });
+    </script>
+}

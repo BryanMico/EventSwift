@@ -84,3 +84,7 @@ C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.Migratio
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.Migrations.ApproveDate.resources
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.Migrations.Followup.resources
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.csproj.AssemblyReference.cache
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\BouncyCastle.Cryptography.dll
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\itextsharp.dll
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\BouncyCastle.Cryptography.xml
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\itextsharp.xml

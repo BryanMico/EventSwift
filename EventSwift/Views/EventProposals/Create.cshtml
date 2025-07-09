@@ -16,23 +16,65 @@
         {
             @Html.AntiForgeryToken()
 
-            <div class="mb-3">
-                @Html.LabelFor(model => model.Title)
-                @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
-            </div>
+            <input type="hidden" name="Title" id="documentTitle" />
 
             <div class="mb-3">
                 <label for="TargetOfficeRole">Send To</label>
-                @Html.DropDownList("TargetOfficeRole", new SelectList(new[] { "VPAA", "VPF", "AMI", "VPA" }), "Select Office", new { @class = "form-control", required = "required" })
+                @Html.DropDownList("TargetOfficeRole", new SelectList(new[] { "VPAA", "VPF", "AMU", "VPA" }), "Select Office", new { @class = "form-control", required = "required" })
             </div>
 
 
             <div class="mb-3">
-                <label>Select File</label>
-                <input type="file" name="uploadedFile" class="form-control" required />
+                <label>Insert a File</label>
+                <div class="custom-file-input">
+                    <input type="file" name="uploadedFile" id="uploadedFile" class="form-control" accept=".pdf" required style="display: none;" />
+                    <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('uploadedFile').click();">
+                        <i class="bi bi-file-earmark-arrow-up me-2"></i>Insert a File
+                    </button>
+                    <span id="file-name" class="ms-2 text-muted"></span>
+                </div>
             </div>
 
             <button type="submit" class="btn text-white" style="background-color: var(--green);">Submit</button>
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Custom file input handling
+            var fileInput = document.getElementById('uploadedFile');
+            var fileNameSpan = document.getElementById('file-name');
+            var documentTitleInput = document.getElementById('documentTitle');
+            
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    if (this.files.length > 0) {
+                        var file = this.files[0];
+                        var fileName = file.name;
+                        var fileExtension = fileName.split('.').pop().toLowerCase();
+                        
+                        // Check if file is PDF
+                        if (fileExtension !== 'pdf') {
+                            alert('Only PDF files are allowed. Please select a PDF file.');
+                            this.value = ''; // Clear the file input
+                            fileNameSpan.textContent = '';
+                            documentTitleInput.value = '';
+                            return;
+                        }
+                        
+                        fileNameSpan.textContent = fileName;
+                        
+                        // Extract title from filename (remove extension)
+                        var title = fileName.replace(/\.[^/.]+$/, ""); // Remove file extension
+                        documentTitleInput.value = title;
+                    } else {
+                        fileNameSpan.textContent = '';
+                        documentTitleInput.value = '';
+                    }
+                });
+            }
+        });
+    </script>
+}

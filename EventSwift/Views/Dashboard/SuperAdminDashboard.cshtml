@@ -35,7 +35,7 @@
             </div>
             <div class="col">
                 <div class="card text-white bg-danger p-2 text-center">
-                    <h6>Rejected Proposals</h6>
+                    <h6>Returned Documents</h6>
                     <p class="fs-4 mb-0">@Model.RejectedProposals</p>
                 </div>
             </div>
@@ -115,7 +115,7 @@
                 datasets: [
                     { label: 'Approved', data: approvedCounts, backgroundColor: 'rgba(40, 167, 69, 0.7)' },
                     { label: 'Pending', data: pendingCounts, backgroundColor: 'rgba(255, 193, 7, 0.7)' },
-                    { label: 'Rejected', data: rejectedCounts, backgroundColor: 'rgba(220, 53, 69, 0.7)' }
+                    { label: 'Returned', data: rejectedCounts, backgroundColor: 'rgba(220, 53, 69, 0.7)' }
                 ]
             },
             options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }

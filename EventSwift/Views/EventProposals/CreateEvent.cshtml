@@ -1,11 +1,11 @@
 ﻿@model EventSwift.Models.Event
 
 @{
-    ViewBag.Title = "Create New Event";
+    ViewBag.Title = "Propose New Event";
     ViewBag.SkipNavbar = true;
 }
 
-@Html.Partial("~/Views/Shared/_SectionHeader.cshtml", new ViewDataDictionary { { "Icon", "bi-plus-circle" }, { "Text", "Create New Event" }, { "Color", "var(--green)" } })
+@Html.Partial("~/Views/Shared/_SectionHeader.cshtml", new ViewDataDictionary { { "Icon", "bi-plus-circle" }, { "Text", "Propose New Event" }, { "Color", "var(--green)" } })
 
 <div class="card shadow-sm border-0" style="max-width: 500px; margin: 0 auto;">
     <div class="card-body">
@@ -22,7 +22,7 @@
             </div>
 
             <button type="submit" class="btn btn-custom w-100 d-flex align-items-center justify-content-center gap-2">
-                <i class="bi bi-plus-circle"></i> Create Event
+                <i class="bi bi-plus-circle"></i> Propose an Event
             </button>
         }
     </div>

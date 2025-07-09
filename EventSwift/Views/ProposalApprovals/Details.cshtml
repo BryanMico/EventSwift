@@ -32,7 +32,7 @@
                 <h2 class="mb-0" style="color: var(--green); font-weight: 600;">
                     <i class="bi bi-file-earmark-check me-2"></i>Approval Details
                 </h2>
-                <small class="text-muted">Review and take action on this proposal</small>
+                <small class="text-muted">Review and take action on this document</small>
             </div>
         </div>
 
@@ -42,14 +42,14 @@
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
                         <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
-                            <i class="bi bi-info-circle me-2"></i>Proposal Information
+                            <i class="bi bi-info-circle me-2"></i>Document Information
                         </h5>
                     </div>
                     <div class="card-body">
                         <dl class="row mb-0">
-                            <dt class="col-sm-5">Proposal Title</dt>
+                            <dt class="col-sm-5">Document Title</dt>
                             <dd class="col-sm-7 fw-semibold">@Model.EventProposal.Title</dd>
-                            <dt class="col-sm-5">Proposal Status</dt>
+                            <dt class="col-sm-5">Document Status</dt>
                             <dd class="col-sm-7">
                                 @if (Model.EventProposal.Status == "Approved")
                                 {
@@ -59,10 +59,10 @@
                                 {
                                     <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
                                 }
-                                else if (Model.EventProposal.Status == "Rejected")
-                                {
-                                    <span class="badge" style="background: var(--brown); color: #fff;">Rejected</span>
-                                }
+                                                            else if (Model.EventProposal.Status == "Rejected")
+                            {
+                                <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
+                            }
                                 else
                                 {
                                     <span class="badge bg-secondary">@Model.EventProposal.Status</span>
@@ -82,10 +82,10 @@
                                 {
                                     <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
                                 }
-                                else if (Model.Status == "Rejected")
-                                {
-                                    <span class="badge" style="background: var(--brown); color: #fff;">Rejected</span>
-                                }
+                                                            else if (Model.Status == "Rejected")
+                            {
+                                <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
+                            }
                                 else
                                 {
                                     <span class="badge bg-secondary">@Model.Status</span>
@@ -93,7 +93,7 @@
                             </dd>
                             <dt class="col-sm-5">Action Date</dt>
                             <dd class="col-sm-7">@((Model.ActionDate.HasValue) ? Model.ActionDate.Value.ToString("g") : "Pending")</dd>
-                            <dt class="col-sm-5">Proposal File</dt>
+                            <dt class="col-sm-5">Document File</dt>
                             <dd class="col-sm-7">
                                 <a href="@Url.Content(Model.EventProposal.FilePath)" target="_blank" class="btn btn-sm btn-outline-custom me-2 mb-1"><i class="bi bi-eye"></i> View</a>
                                 <a href="@Url.Content(Model.EventProposal.FilePath)" download class="btn btn-sm btn-outline-custom mb-1"><i class="bi bi-download"></i> Download</a>
@@ -102,13 +102,13 @@
                     </div>
                 </div>
 
-                <!-- Approve/Reject Form -->
+                <!-- Approve/Return Form -->
                 @if (Model.Status == "Pending" || Model.Status == "Resubmitted")
                 {
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
                             <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
-                                <i class="bi bi-check2-square me-2"></i>Take Action
+                                <i class="bi bi-check2-square me-2"></i>Approve/Return
                             </h5>
                         </div>
                         <div class="card-body">
@@ -116,42 +116,47 @@
                             {
                                 <div class="alert alert-info mb-3">
                                     <i class="bi bi-info-circle me-1"></i>
-                                    <strong>VPA Approval:</strong> You must select an event date when approving this proposal. Click "Approve" to open the date selection calendar.
+                                    <strong>VPA Approval:</strong> You must select an event date and time when approving this document.
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="modalEventDate" class="form-label">Event Date:</label>
+                                        <input type="date" class="form-control" id="modalEventDate" name="eventDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="modalEventTime" class="form-label">Event Time:</label>
+                                        <input type="time" class="form-control" id="modalEventTime" name="eventTime" value="09:00" required />
+                                    </div>
                                 </div>
                             }
 
-                            @using (Html.BeginForm("Action", "ProposalApprovals", FormMethod.Post))
+                            @using (Html.BeginForm("Action", "ProposalApprovals", FormMethod.Post, new { enctype = "multipart/form-data", id = "approvalForm" }))
                             {
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@Model.ProposalApprovalId" />
-                                <input type="hidden" name="eventDate" id="selectedEventDate" />
+                                <input type="hidden" name="eventDate" id="selectedEventDate" value="" />
+                                <input type="hidden" name="signatureData" id="signatureData" />
+                                <input type="hidden" name="approvalPassword" id="approvalPasswordHidden" />
+                                <input type="hidden" name="action" id="actionHidden" value="Approve" />
 
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" value="" id="rejectToggle" />
                                     <label class="form-check-label" for="rejectToggle">
-                                        I want to reject this proposal and provide feedback
+                                        I want to return this document and provide feedback
                                     </label>
                                 </div>
 
                                 <div class="mb-3" id="feedbackContainer" style="display:none;">
-                                    <label for="feedbackMessage" class="form-label">Feedback for rejection:</label>
+                                    <label for="feedbackMessage" class="form-label">Feedback for return:</label>
                                     <textarea class="form-control" id="feedbackMessage" name="feedbackMessage" rows="4"></textarea>
                                     @Html.ValidationMessage("feedbackMessage", "", new { @class = "text-danger" })
                                 </div>
 
-                                if (isVPA)
-                                {
-                                    <button type="button" id="approveBtn" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#dateSelectionModal">
-                                        <i class="bi bi-check-circle me-1"></i>Approve
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button type="submit" id="approveBtn" class="btn btn-success me-2" name="action" value="Approve">
-                                        <i class="bi bi-check-circle me-1"></i>Approve
-                                    </button>
-                                }
-                                <button type="submit" id="rejectBtn" class="btn btn-danger" name="action" value="Reject"><i class="bi bi-x-circle me-1"></i>Reject</button>
+                                <button type="button" id="approveBtn" class="btn btn-success me-2">
+                                    <i class="bi bi-check-circle me-1"></i>Approve
+                                </button>
+                                <button type="button" id="rejectBtn" class="btn btn-danger"><i class="bi bi-x-circle me-1"></i>Return</button>
                                 @Html.ActionLink("Cancel", "ApprovalsIndex", null, new { @class = "btn btn-outline-custom ms-2" })
                             }
                         </div>
@@ -203,41 +208,38 @@
     </div>
 </div>
 
-<!-- Date Selection Modal for VPA -->
-@if (isVPA)
-{
-    <div class="modal fade" id="dateSelectionModal" tabindex="-1" aria-labelledby="dateSelectionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: var(--green); color: white;">
-                    <h5 class="modal-title" id="dateSelectionModalLabel">
-                        <i class="bi bi-calendar-event me-2"></i>Select Event Date
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="text-center mb-3">
-                        <p class="mb-3">Please select the date for this event:</p>
-                        <div class="d-flex justify-content-center">
-                            <input type="date" class="form-control" id="modalEventDate" style="max-width: 250px;" required />
-                        </div>
-                        <div class="form-text mt-2">This date will be used for the event scheduling.</div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle me-1"></i> Cancel
-                    </button>
-                    <button type="button" class="btn btn-success" id="confirmDateBtn">
-                        <i class="bi bi-check-circle me-1"></i> Confirm & Approve
-                    </button>
-                </div>
-            </div>
+
+
+<!-- Approval Modal for Password and E-Signature -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="approveModalLabel">Confirm Approval</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body d-flex">
+        <!-- Password input -->
+        <div class="flex-fill me-4">
+          <label for="approvalPasswordInput" class="form-label">Enter your password:</label>
+          <input type="password" class="form-control" id="approvalPasswordInput" required>
         </div>
+        <!-- Signature pad -->
+        <div class="flex-fill">
+          <label class="form-label">E-Signature:</label>
+          <canvas id="signaturePad" style="border:1px solid #ccc; width:100%; height:150px;"></canvas>
+          <button type="button" class="btn btn-sm btn-secondary mt-2" id="clearSignature">Clear</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="confirmApprovalBtn">Confirm Approval</button>
+      </div>
     </div>
-}
+  </div>
+</div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
     <script>
         const rejectToggle = document.getElementById('rejectToggle');
         const feedbackContainer = document.getElementById('feedbackContainer');
@@ -246,7 +248,7 @@
         const approveBtn = document.getElementById('approveBtn');
         const selectedEventDate = document.getElementById('selectedEventDate');
         const modalEventDate = document.getElementById('modalEventDate');
-        const confirmDateBtn = document.getElementById('confirmDateBtn');
+        const modalEventTime = document.getElementById('modalEventTime');
         const isVPA = @(isVPA ? "true" : "false");
 
         if (rejectToggle) {
@@ -263,42 +265,83 @@
             rejectBtn.addEventListener('click', function (e) {
                 if (!rejectToggle.checked) {
                     e.preventDefault();
-                    alert('Please check "I want to reject" to provide feedback.');
+                    alert('Please check "I want to return" to provide feedback.');
                     return;
                 }
                 if (feedbackMessage.value.trim() === '') {
                     e.preventDefault();
-                    alert('Please provide feedback when rejecting.');
+                    alert('Please provide feedback when returning.');
                     feedbackMessage.focus();
-                }
-            });
-        }
-
-        // Handle date confirmation for VPA
-        if (isVPA && confirmDateBtn) {
-            confirmDateBtn.addEventListener('click', function () {
-                if (!modalEventDate.value) {
-                    alert('Please select an event date before approving.');
-                    modalEventDate.focus();
                     return;
                 }
-
-                // Set the selected date in the hidden field
-                selectedEventDate.value = modalEventDate.value;
                 
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('dateSelectionModal'));
-                modal.hide();
-                
-                // Submit the form with approve action
-                const form = document.querySelector('form');
-                const actionInput = document.createElement('input');
-                actionInput.type = 'hidden';
-                actionInput.name = 'action';
-                actionInput.value = 'Approve';
-                form.appendChild(actionInput);
-                form.submit();
+                // Set the action to Return and submit the form
+                document.getElementById('actionHidden').value = 'Reject';
+                document.getElementById('approvalForm').submit();
             });
         }
+
+        // Handle approve button click
+        if (approveBtn) {
+            approveBtn.addEventListener('click', function (e) {
+                if (isVPA) {
+                    // For VPA, validate date and time first
+                    if (!modalEventDate.value) {
+                        alert('Please select an event date before approving.');
+                        modalEventDate.focus();
+                        return;
+                    }
+                    if (!modalEventTime.value) {
+                        alert('Please select an event time before approving.');
+                        modalEventTime.focus();
+                        return;
+                    }
+                    
+                    // Combine date and time and set in hidden field
+                    const dateTimeValue = modalEventDate.value + 'T' + modalEventTime.value;
+                    selectedEventDate.value = dateTimeValue;
+                    
+                    // Show approval modal for password and signature
+                    const approveModal = new bootstrap.Modal(document.getElementById('approveModal'));
+                    approveModal.show();
+                } else {
+                    // For non-VPA, show approval modal directly
+                    const approveModal = new bootstrap.Modal(document.getElementById('approveModal'));
+                    approveModal.show();
+                }
+            });
+        }
+
+        // Signature Pad logic
+        let signaturePad;
+        document.addEventListener('DOMContentLoaded', function () {
+            const canvas = document.getElementById('signaturePad');
+            if (canvas) {
+                signaturePad = new SignaturePad(canvas);
+                document.getElementById('clearSignature').onclick = () => signaturePad.clear();
+            }
+        });
+
+        // Approval Modal logic
+        document.getElementById('confirmApprovalBtn').addEventListener('click', function () {
+            const passwordInput = document.getElementById('approvalPasswordInput');
+            if (!passwordInput.value) {
+                alert('Please enter your password.');
+                passwordInput.focus();
+                return;
+            }
+            if (!signaturePad || signaturePad.isEmpty()) {
+                alert('Please provide your e-signature.');
+                return;
+            }
+            // Set hidden fields in the form
+            document.getElementById('approvalPasswordHidden').value = passwordInput.value;
+            document.getElementById('signatureData').value = signaturePad.toDataURL();
+            document.getElementById('actionHidden').value = 'Approve'; // Always set action to Approve
+            // Submit the form
+            document.getElementById('approvalForm').submit();
+        });
+
+
     </script>
 }

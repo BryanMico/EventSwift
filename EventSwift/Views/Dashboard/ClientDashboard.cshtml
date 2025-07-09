@@ -209,18 +209,64 @@
                         <i class="bi bi-x-circle display-6"></i>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title mb-1">Rejected Proposals</h5>
+                        <h5 class="card-title mb-1">Returned Documents</h5>
                         <p class="card-text fs-3 mb-0">@Model.RejectedProposalsCount</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="calendar-container mt-3">
-            <div id="calendar"></div>
-            <div id="eventPreview" class="empty">
-                <h4><i class="bi bi-calendar-event me-2"></i>Event Details</h4>
-                <p><i class="bi bi-info-circle me-2"></i>Select an event on the calendar to see details here.</p>
+        @if (Model.Events.Any(e => e.Status == "ApprovedByPresident"))
+        {
+            <div class="calendar-container mt-3">
+                <div id="calendar"></div>
+                <div id="eventPreview" class="empty">
+                    <h4><i class="bi bi-calendar-event me-2"></i>Event Details</h4>
+                    <p><i class="bi bi-info-circle me-2"></i>Select an event on the calendar to see details here.</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-center mt-4 p-5" style="background: var(--light-yellow); border-radius: 1rem; border: 2px dashed var(--orange);">
+                <i class="bi bi-calendar-x display-1" style="color: var(--orange);"></i>
+                <h4 class="mt-3" style="color: var(--green);">No Approved Events Yet</h4>
+                <p class="text-muted mb-4">You don't have any approved events to display in the calendar yet.</p>
+                <button type="button" class="btn btn-custom d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                    <i class="bi bi-plus-circle"></i> Propose an Event
+                </button>
+            </div>
+        }
+
+        <!-- Create Event Modal -->
+        <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: var(--green); color: white;">
+                        <h5 class="modal-title" id="createEventModalLabel">
+                            <i class="bi bi-plus-circle me-2"></i> Propose New Event
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    @using (Html.BeginForm("CreateEvent", "EventProposals", FormMethod.Post, new { id = "createEventForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="Title" class="form-label fw-semibold" style="color: var(--green);">
+                                    <i class="bi bi-type me-1"></i> Event Title
+                                </label>
+                                <input type="text" name="Title" id="eventTitle" class="form-control" placeholder="Enter event title" required />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-custom d-flex align-items-center gap-2">
+                                <i class="bi bi-plus-circle"></i> Propose an Event
+                            </button>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
@@ -232,53 +278,50 @@
             var calendarEl = document.getElementById('calendar');
             var previewEl = document.getElementById('eventPreview');
 
-            if (!calendarEl || !previewEl) {
-                console.error("Required elements not found");
-                return;
-            }
+            // Only initialize calendar if elements exist (meaning there are approved events)
+            if (calendarEl && previewEl) {
+                var events = @Html.Raw(eventsJson);
 
-            var events = @Html.Raw(eventsJson);
-
-            function clearPreview() {
-                previewEl.classList.add('empty');
-                previewEl.innerHTML = `
-                    <h4><i class="bi bi-calendar-event me-2"></i>Event Details</h4>
-                    <p><i class="bi bi-info-circle me-2"></i>Select an event on the calendar to see details here.</p>
-                `;
-            }
-
-            function showPreview(event) {
-                previewEl.classList.remove('empty');
-                previewEl.innerHTML = `
-                    <h4>${event.title}</h4>
-                    <p><strong>Date:</strong> ${event.startStr}</p>
-                    <p><strong>Status:</strong> ${event.extendedProps.status}</p>
-                `;
-            }
-
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                height: 450,
-                events: events,
-                eventDidMount: function (info) {
-                    var status = info.event.extendedProps.status;
-                    if (status) {
-                        info.el.setAttribute('title', 'Status: ' + status);
-                    }
-                },
-                eventClick: function(info) {
-                    showPreview(info.event);
-                },
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                function clearPreview() {
+                    previewEl.classList.add('empty');
+                    previewEl.innerHTML = `
+                        <h4><i class="bi bi-calendar-event me-2"></i>Event Details</h4>
+                        <p><i class="bi bi-info-circle me-2"></i>Select an event on the calendar to see details here.</p>
+                    `;
                 }
-            });
 
-            calendar.render();
+                function showPreview(event) {
+                    previewEl.classList.remove('empty');
+                    previewEl.innerHTML = `
+                        <h4>${event.title}</h4>
+                        <p><strong>Date:</strong> ${event.startStr}</p>
+                        <p><strong>Status:</strong> ${event.extendedProps.status}</p>
+                    `;
+                }
 
-            clearPreview();
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    height: 450,
+                    events: events,
+                    eventDidMount: function (info) {
+                        var status = info.event.extendedProps.status;
+                        if (status) {
+                            info.el.setAttribute('title', 'Status: ' + status);
+                        }
+                    },
+                    eventClick: function(info) {
+                        showPreview(info.event);
+                    },
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,listWeek'
+                    }
+                });
+
+                calendar.render();
+                clearPreview();
+            }
         });
     </script>
 }

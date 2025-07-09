@@ -35,7 +35,7 @@
                 @if (Model.ApprovedDate.HasValue)
                 {
                     <div class="mb-2">
-                        <span class="me-3"><i class="bi bi-calendar-check me-1"></i> <strong>Proposed Event Date:</strong> <span class="badge bg-info text-dark">@Model.ApprovedDate.Value.ToString("MMMM dd, yyyy")</span></span>
+                        <span class="me-3"><i class="bi bi-calendar-check me-1"></i> <strong>Proposed Event Date:</strong> <span class="badge bg-info text-dark">@Model.ApprovedDate.Value.ToString("MMMM dd, yyyy h:mm tt")</span></span>
                     </div>
                 }
                 @if (Model.Status == "SentToPresident")
@@ -48,20 +48,14 @@
                                 <i class="bi bi-check-circle me-1"></i> Approve Event
                             </button>
                         </form>
-                        <form action="@Url.Action("PresidentReject", "EventProposals")" method="post" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="eventId" value="@Model.EventId" />
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to reject this event?')">
-                                <i class="bi bi-x-circle me-1"></i> Reject Event
-                            </button>
-                        </form>
+
                     </div>
                 }
             </div>
         </div>
 
         <div class="mb-4">
-            <h5 class="mb-3" style="color: var(--green); font-weight: 600;"><i class="bi bi-file-earmark-text me-2"></i>Proposals</h5>
+            <h5 class="mb-3" style="color: var(--green); font-weight: 600;"><i class="bi bi-file-earmark-text me-2"></i>Documents</h5>
             @if (Model.Proposals != null && Model.Proposals.Any())
             {
                 <div class="card shadow-sm border-0">
@@ -72,7 +66,7 @@
                                     <th style="color: var(--green);">Title</th>
                                     <th style="color: var(--green);">Status</th>
                                     <th style="color: var(--green);">Submitted At</th>
-                                    <th style="color: var(--green);">Target Office</th>
+                                    <th style="color: var(--green);">Receiving Office</th>
                                     <th style="color: var(--green);">File</th>
                                 </tr>
                             </thead>
@@ -92,7 +86,7 @@
                                             }
                                             else if (proposal.Status == "Rejected")
                                             {
-                                                <span class="badge" style="background: var(--brown); color: #fff;">Rejected</span>
+                                                <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
                                             }
                                             else
                                             {
@@ -113,7 +107,7 @@
             }
             else
             {
-                <div class="alert alert-info">No proposals submitted yet for this event.</div>
+                <div class="alert alert-info">No documents submitted yet for this event.</div>
             }
         </div>
     </div>
