@@ -187,7 +187,7 @@
                         <i class="bi bi-file-earmark-text display-6"></i>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title mb-1">My Proposals</h5>
+                        <h5 class="card-title mb-1">Submitted Documents</h5>
                         <p class="card-text fs-3 mb-0">@Model.MyProposalsCount</p>
                     </div>
                 </div>
@@ -218,7 +218,11 @@
 
         @if (Model.Events.Any(e => e.Status == "ApprovedByPresident"))
         {
+            <button type="button" class="btn btn-custom d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                <i class="bi bi-plus-circle"></i> Propose an Event
+            </button>
             <div class="calendar-container mt-3">
+
                 <div id="calendar"></div>
                 <div id="eventPreview" class="empty">
                     <h4><i class="bi bi-calendar-event me-2"></i>Event Details</h4>
