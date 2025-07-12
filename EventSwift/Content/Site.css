@@ -186,3 +186,249 @@ h1, h2, h3, h4, h5, h6 {
     margin-right: 0.5em;
     vertical-align: middle;
 }
+
+/* Timeline Styles for Document Tracking */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -45px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    z-index: 2;
+}
+
+.timeline-marker.success {
+    background-color: var(--green);
+}
+
+.timeline-marker.danger {
+    background-color: var(--brown);
+}
+
+.timeline-marker.primary {
+    background-color: #007bff;
+}
+
+.timeline-marker.info {
+    background-color: var(--orange);
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border-left: 4px solid var(--green);
+}
+
+.timeline-line {
+    position: absolute;
+    left: -30px;
+    top: 30px;
+    width: 2px;
+    height: 30px;
+    background-color: #dee2e6;
+    z-index: 1;
+}
+
+.timeline-item:last-child .timeline-line {
+    display: none;
+}
+
+/* Logistics Timeline Styles */
+.logistics-timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.logistics-step {
+    position: relative;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.logistics-step.completed {
+    background: #d4edda;
+    border-left-color: #28a745;
+}
+
+.logistics-step.rejected {
+    background: #f8d7da;
+    border-left-color: #dc3545;
+}
+
+.logistics-step.in-progress {
+    background: #fff3cd;
+    border-left-color: #ffc107;
+    animation: pulse 2s infinite;
+}
+
+.logistics-step.pending {
+    background: #e9ecef;
+    border-left-color: #6c757d;
+}
+
+.logistics-marker {
+    position: absolute;
+    left: -50px;
+    top: 15px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logistics-marker.success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.logistics-marker.danger {
+    background: linear-gradient(135deg, #dc3545, #e74c3c);
+}
+
+.logistics-marker.warning {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+}
+
+.logistics-marker.secondary {
+    background: linear-gradient(135deg, #6c757d, #495057);
+}
+
+.logistics-marker.info {
+    background: linear-gradient(135deg, #17a2b8, #20c997);
+}
+
+.logistics-content {
+    margin-left: 10px;
+}
+
+.logistics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.logistics-header h6 {
+    margin: 0;
+    font-weight: 600;
+    color: #495057;
+}
+
+.logistics-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.logistics-status.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.logistics-status.danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.logistics-status.warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.logistics-status.secondary {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.logistics-status.info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.logistics-description {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.logistics-line {
+    position: absolute;
+    left: -32px;
+    top: 50px;
+    width: 2px;
+    height: 30px;
+    background: #dee2e6;
+    z-index: 1;
+}
+
+.logistics-line.completed {
+    background: #28a745;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .logistics-timeline {
+        padding-left: 30px;
+    }
+    
+    .logistics-marker {
+        left: -40px;
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    
+    .logistics-line {
+        left: -25px;
+    }
+    
+    .logistics-header {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .logistics-status {
+        align-self: flex-start;
+    }
+}

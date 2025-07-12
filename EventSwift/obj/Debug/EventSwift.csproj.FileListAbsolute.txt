@@ -88,3 +88,4 @@ C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\BouncyCastle.Cryptography
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\itextsharp.dll
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\BouncyCastle.Cryptography.xml
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\itextsharp.xml
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.Migrations.ProposalTracking.resources

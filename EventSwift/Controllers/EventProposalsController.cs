@@ -169,25 +169,21 @@ namespace EventSwift.Controllers
 
             if (ev == null) return HttpNotFound();
 
-            // Check if all submitted proposals are approved (don't require all offices to have proposals)
-            bool allProposalsApproved = ev.Proposals.Any() && ev.Proposals.All(p => p.Approvals.Any(a => a.Office == p.TargetOfficeRole && a.Status == "Approved"));
+            // Check if all VPA approvals are completed
+            var vpaApprovals = ev.Proposals.SelectMany(p => p.Approvals).Where(a => a.Office == "VPA").ToList();
+            bool allVPAApproved = vpaApprovals.Any() && vpaApprovals.All(a => a.Status == "Approved");
 
-            // Debug information
-            var debugProposals = ev.Proposals.Select(p => new { 
-                Title = p.Title, 
-                TargetOffice = p.TargetOfficeRole, 
-                Status = p.Status,
-                Approvals = p.Approvals.Select(a => new { Office = a.Office, Status = a.Status }).ToList()
-            }).ToList();
-
-            if (!allProposalsApproved)
+            if (!allVPAApproved)
             {
-                TempData["Error"] = $"Cannot send to President. Debug: allProposalsApproved={allProposalsApproved}, Proposals: {string.Join(", ", debugProposals.Select(p => $"{p.Title}({p.TargetOffice}:{p.Status})"))}";
+                TempData["Error"] = "Cannot send to President. All documents must be approved by VPA first.";
                 return RedirectToAction("Details", new { id = eventId });
             }
 
             // Mark event as sent to president
             ev.Status = "SentToPresident";
+
+
+
             db.SaveChanges();
 
             // Notify Presidents (assuming role = "President")
@@ -426,7 +422,9 @@ namespace EventSwift.Controllers
         [HttpPost]
         public ActionResult ApproveEvent(int eventId, DateTime approvedDate)
         {
-            var ev = db.Events.FirstOrDefault(e => e.EventId == eventId);
+            var ev = db.Events
+                .Include(e => e.Proposals)
+                .FirstOrDefault(e => e.EventId == eventId);
 
             if (ev == null)
             {
@@ -436,6 +434,9 @@ namespace EventSwift.Controllers
 
             ev.Status = "ApprovedByPresident";
             ev.ApprovedDate = approvedDate; // ✅ Use the new field
+
+
+
             db.SaveChanges();
 
             // Send notification to the client

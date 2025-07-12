@@ -1,0 +1,427 @@
+@model EventSwift.Models.Event
+
+@{
+    ViewBag.Title = "VPA Event Overview";
+    ViewBag.SkipNavbar = true;
+
+    // Get all proposals and their approvals for this event
+    var allProposals = Model.Proposals?.ToList() ?? new List<EventSwift.Models.EventProposal>();
+    
+    // Group proposals by their original target office
+    var vpaaProposals = allProposals.Where(p => p.TargetOfficeRole == "VPAA").ToList();
+    var vpfProposals = allProposals.Where(p => p.TargetOfficeRole == "VPF").ToList();
+    var amuProposals = allProposals.Where(p => p.TargetOfficeRole == "AMU").ToList();
+    var directVpaProposals = allProposals.Where(p => p.TargetOfficeRole == "VPA").ToList();
+    
+    // Check VPA approval status for each office's proposals
+    var vpaaVpaApprovals = vpaaProposals.SelectMany(p => p.Approvals).Where(a => a.Office == "VPA").ToList();
+    var vpfVpaApprovals = vpfProposals.SelectMany(p => p.Approvals).Where(a => a.Office == "VPA").ToList();
+    var amuVpaApprovals = amuProposals.SelectMany(p => p.Approvals).Where(a => a.Office == "VPA").ToList();
+    var directVpaApprovals = directVpaProposals.SelectMany(p => p.Approvals).Where(a => a.Office == "VPA").ToList();
+    
+    bool allVpaaReviewed = vpaaProposals.Any() && vpaaProposals.All(p => p.Approvals.Any(a => a.Office == "VPAA" && a.Status == "Approved"));
+    bool allVpfReviewed = vpfProposals.Any() && vpfProposals.All(p => p.Approvals.Any(a => a.Office == "VPF" && a.Status == "Approved"));
+    bool allAmuReviewed = amuProposals.Any() && amuProposals.All(p => p.Approvals.Any(a => a.Office == "AMU" && a.Status == "Approved"));
+    
+    bool allVpaaVpaApproved = vpaaVpaApprovals.Any() && vpaaVpaApprovals.All(a => a.Status == "Approved");
+    bool allVpfVpaApproved = vpfVpaApprovals.Any() && vpfVpaApprovals.All(a => a.Status == "Approved");
+    bool allAmuVpaApproved = amuVpaApprovals.Any() && amuVpaApprovals.All(a => a.Status == "Approved");
+    bool allDirectVpaApproved = directVpaApprovals.Any() && directVpaApprovals.All(a => a.Status == "Approved");
+    
+    // Can send to President if all VPA approvals are complete
+    bool canSendToPresident = (allVpaaVpaApproved || !vpaaProposals.Any()) &&
+                              (allVpfVpaApproved || !vpfProposals.Any()) &&
+                              (allAmuVpaApproved || !amuProposals.Any()) &&
+                              (allDirectVpaApproved || !directVpaProposals.Any());
+}
+
+<div class="d-flex">
+    @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
+    <div class="flex-grow-1 p-2">
+        @Html.Partial("~/Views/Shared/_Navbar.cshtml")
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a href="@Url.Action("ApprovalsIndex", "ProposalApprovals")" class="btn btn-link" style="color: var(--green); text-decoration: none; font-weight: 500;">
+                <i class="bi bi-arrow-left me-1"></i> Back to Events
+            </a>
+            @if (Model.Status != "SentToPresident" && Model.Status != "ApprovedByPresident" && canSendToPresident)
+            {
+                <button type="button" class="btn btn-warning d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#sendToPresidentModal">
+                    <i class="bi bi-send"></i> Send to President
+                </button>
+            }
+        </div>
+
+        @Html.Partial("~/Views/Shared/_SectionHeader.cshtml", new ViewDataDictionary { { "Icon", "bi-building" }, { "Text", $"VPA Overview: {Model.Title}" }, { "Color", "var(--green)" }, { "Status", Model.Status } })
+
+        <!-- Office Status Overview -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
+                <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
+                    <i class="bi bi-clipboard-check me-2"></i>Office Review Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- VPAA Status -->
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="mb-2">
+                                    <i class="bi bi-person-circle" style="color: @(allVpaaReviewed ? "#28a745" : "#dc3545"); font-size: 2em;"></i>
+                                </div>
+                                <h6 class="card-title">VPAA</h6>
+                                <div class="mb-2">
+                                    @if (allVpaaReviewed)
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (vpaaProposals.Any())
+                                    {
+                                        <span class="badge bg-warning">Pending Approval</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No Documents</span>
+                                    }
+                                </div>
+                                @if (vpaaProposals.Any())
+                                {
+                                    <small class="text-muted">@vpaaProposals.Count document(s)</small>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VPF Status -->
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="mb-2">
+                                    <i class="bi bi-person-circle" style="color: @(allVpfReviewed ? "#28a745" : "#dc3545"); font-size: 2em;"></i>
+                                </div>
+                                <h6 class="card-title">VPF</h6>
+                                <div class="mb-2">
+                                    @if (allVpfReviewed)
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (vpfProposals.Any())
+                                    {
+                                        <span class="badge bg-warning">Pending Approval</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No Documents</span>
+                                    }
+                                </div>
+                                @if (vpfProposals.Any())
+                                {
+                                    <small class="text-muted">@vpfProposals.Count document(s)</small>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AMU Status -->
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="mb-2">
+                                    <i class="bi bi-person-circle" style="color: @(allAmuReviewed ? "#28a745" : "#dc3545"); font-size: 2em;"></i>
+                                </div>
+                                <h6 class="card-title">AMU</h6>
+                                <div class="mb-2">
+                                    @if (allAmuReviewed)
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (amuProposals.Any())
+                                    {
+                                        <span class="badge bg-warning">Pending Approval</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No Documents</span>
+                                    }
+                                </div>
+                                @if (amuProposals.Any())
+                                {
+                                    <small class="text-muted">@amuProposals.Count document(s)</small>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direct VPA Status -->
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="mb-2">
+                                    <i class="bi bi-person-circle" style="color: @(allDirectVpaApproved ? "#28a745" : "#dc3545"); font-size: 2em;"></i>
+                                </div>
+                                <h6 class="card-title">Direct VPA</h6>
+                                <div class="mb-2">
+                                    @if (allDirectVpaApproved)
+                                    {
+                                        <span class="badge bg-success">Approved</span>
+                                    }
+                                    else if (directVpaProposals.Any())
+                                    {
+                                        <span class="badge bg-warning">Pending Approval</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No Documents</span>
+                                    }
+                                </div>
+                                @if (directVpaProposals.Any())
+                                {
+                                    <small class="text-muted">@directVpaProposals.Count document(s)</small>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VPA Approval Status -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
+                <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
+                    <i class="bi bi-check-circle me-2"></i>VPA Approval Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="mb-2">
+                                    <i class="bi bi-check-circle" style="color: @(allVpaaVpaApproved ? "#28a745" : "#dc3545"); font-size: 2em;"></i>
+                                </div>
+                                <h6 class="card-title">VPAA Documents</h6>
+                                <div class="mb-2">
+                                    @if (allVpaaVpaApproved)
+                                    {
+                                        <span class="badge bg-success">VPA Approved</span>
+                                    }
+                                    else if (allVpaaReviewed)
+                                    {
+                                        <span class="badge bg-warning">Pending VPA Approval</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Waiting for VPAA</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="mb-2">
+                                    <i class="bi bi-check-circle" style="color: @(allVpfVpaApproved ? "#28a745" : "#dc3545"); font-size: 2em;"></i>
+                                </div>
+                                <h6 class="card-title">VPF Documents</h6>
+                                <div class="mb-2">
+                                    @if (allVpfVpaApproved)
+                                    {
+                                        <span class="badge bg-success">VPA Approved</span>
+                                    }
+                                    else if (allVpfReviewed)
+                                    {
+                                        <span class="badge bg-warning">Pending VPA Approval</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Waiting for VPF</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="mb-2">
+                                    <i class="bi bi-check-circle" style="color: @(allAmuVpaApproved ? "#28a745" : "#dc3545"); font-size: 2em;"></i>
+                                </div>
+                                <h6 class="card-title">AMU Documents</h6>
+                                <div class="mb-2">
+                                    @if (allAmuVpaApproved)
+                                    {
+                                        <span class="badge bg-success">VPA Approved</span>
+                                    }
+                                    else if (allAmuReviewed)
+                                    {
+                                        <span class="badge bg-warning">Pending VPA Approval</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Waiting for AMU</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="mb-2">
+                                    <i class="bi bi-check-circle" style="color: @(allDirectVpaApproved ? "#28a745" : "#dc3545"); font-size: 2em;"></i>
+                                </div>
+                                <h6 class="card-title">Direct VPA</h6>
+                                <div class="mb-2">
+                                    @if (allDirectVpaApproved)
+                                    {
+                                        <span class="badge bg-success">VPA Approved</span>
+                                    }
+                                    else if (directVpaProposals.Any())
+                                    {
+                                        <span class="badge bg-warning">Pending VPA Approval</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No Direct Documents</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents List -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
+                <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
+                    <i class="bi bi-file-earmark-text me-2"></i>All Documents
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                @if (allProposals.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead style="background: var(--light-yellow);">
+                                <tr>
+                                    <th style="color: var(--green);">Title</th>
+                                    <th style="color: var(--green);">Original Office</th>
+                                    <th style="color: var(--green);">Office Status</th>
+                                    <th style="color: var(--green);">VPA Status</th>
+                                    <th style="color: var(--green);">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var proposal in allProposals)
+                                {
+                                    var officeApproval = proposal.Approvals.FirstOrDefault(a => a.Office == proposal.TargetOfficeRole);
+                                    var vpaApproval = proposal.Approvals.FirstOrDefault(a => a.Office == "VPA");
+                                    
+                                    <tr>
+                                        <td>@proposal.Title</td>
+                                        <td>@proposal.TargetOfficeRole</td>
+                                        <td>
+                                            @if (officeApproval?.Status == "Approved")
+                                            {
+                                                <span class="badge bg-success">Approved</span>
+                                            }
+                                            else if (officeApproval?.Status == "Rejected")
+                                            {
+                                                <span class="badge bg-danger">Returned</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning">For Approval</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (vpaApproval?.Status == "Approved")
+                                            {
+                                                <span class="badge bg-success">Approved</span>
+                                            }
+                                            else if (vpaApproval?.Status == "Rejected")
+                                            {
+                                                <span class="badge bg-danger">Returned</span>
+                                            }
+                                            else if (officeApproval?.Status == "Approved" || proposal.TargetOfficeRole == "VPA")
+                                            {
+                                                <span class="badge bg-warning">Pending VPA Approval</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Waiting for Office</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (vpaApproval != null && (vpaApproval.Status == "Pending" || vpaApproval.Status == "Resubmitted"))
+                                            {
+                                                <a href="@Url.Action("Details", "ProposalApprovals", new { id = vpaApproval.ProposalApprovalId })" class="btn btn-sm btn-custom">
+                                                    <i class="bi bi-check2-square me-1"></i> Review
+                                                </a>
+                                            }
+                                            else if (vpaApproval != null)
+                                            {
+                                                <a href="@Url.Action("Details", "ProposalApprovals", new { id = vpaApproval.ProposalApprovalId })" class="btn btn-sm btn-outline-custom">
+                                                    <i class="bi bi-eye me-1"></i> View
+                                                </a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-file-earmark-text" style="font-size: 2em; color: var(--orange);"></i>
+                        <p class="mt-2 mb-0">No documents found for this event.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+
+
+        <!-- Send to President Modal -->
+        <div class="modal fade" id="sendToPresidentModal" tabindex="-1" aria-labelledby="sendToPresidentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="sendToPresidentModalLabel">
+                            <i class="bi bi-send me-2"></i>Send to President
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    @using (Html.BeginForm("SendToPresident", "EventProposals", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("eventId", Model.EventId)
+                        <div class="modal-body">
+                            <p>Are you sure you want to send this event to the President for final approval?</p>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Note:</strong> This action will send all VPA-approved documents to the President for final review.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-warning d-flex align-items-center gap-2">
+                                <i class="bi bi-send"></i> Confirm Send
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

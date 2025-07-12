@@ -54,22 +54,34 @@
                                         <td>
                                             @if (approval != null)
                                             {
+                                                var statusBadgeClass = "";
+                                                var statusText = approval.Status;
+                                                
                                                 if (approval.Status == "Approved")
                                                 {
-                                                    <span class="badge" style="background: var(--green); color: #fff;">Approved</span>
+                                                    statusBadgeClass = "badge";
+                                                    statusText = "Approved";
                                                 }
                                                 else if (approval.Status == "Pending")
                                                 {
-                                                    <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
+                                                    statusBadgeClass = "badge";
+                                                    statusText = "For Approval";
                                                 }
                                                 else if (approval.Status == "Rejected")
                                                 {
-                                                    <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
+                                                    statusBadgeClass = "badge";
+                                                    statusText = "Returned";
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-secondary">@approval.Status</span>
+                                                    statusBadgeClass = "badge bg-secondary";
                                                 }
+                                                
+                                                <span class="@statusBadgeClass" style="@(approval.Status == "Approved" ? "background: var(--green); color: #fff;" : 
+                                                                                        approval.Status == "Pending" ? "background: var(--orange); color: #fff;" : 
+                                                                                        approval.Status == "Rejected" ? "background: var(--brown); color: #fff;" : "")">
+                                                    @statusText
+                                                </span>
                                             }
                                             else
                                             {

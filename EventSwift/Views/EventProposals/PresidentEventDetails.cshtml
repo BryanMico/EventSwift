@@ -76,22 +76,35 @@
                                     <tr>
                                         <td>@proposal.Title</td>
                                         <td>
-                                            @if (proposal.Status == "Approved")
-                                            {
-                                                <span class="badge" style="background: var(--green); color: #fff;">Approved</span>
+                                            @{
+                                                var statusBadgeClass = "";
+                                                var statusText = proposal.Status;
+                                                
+                                                if (proposal.Status == "Approved")
+                                                {
+                                                    statusBadgeClass = "badge";
+                                                    statusText = "Approved";
+                                                }
+                                                else if (proposal.Status == "Pending")
+                                                {
+                                                    statusBadgeClass = "badge";
+                                                    statusText = "For Approval";
+                                                }
+                                                else if (proposal.Status == "Rejected")
+                                                {
+                                                    statusBadgeClass = "badge";
+                                                    statusText = "Returned";
+                                                }
+                                                else
+                                                {
+                                                    statusBadgeClass = "badge bg-secondary";
+                                                }
                                             }
-                                            else if (proposal.Status == "Pending")
-                                            {
-                                                <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
-                                            }
-                                            else if (proposal.Status == "Rejected")
-                                            {
-                                                <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-secondary">@proposal.Status</span>
-                                            }
+                                            <span class="@statusBadgeClass" style="@(proposal.Status == "Approved" ? "background: var(--green); color: #fff;" : 
+                                                                                    proposal.Status == "Pending" ? "background: var(--orange); color: #fff;" : 
+                                                                                    proposal.Status == "Rejected" ? "background: var(--brown); color: #fff;" : "")">
+                                                @statusText
+                                            </span>
                                         </td>
                                         <td>@proposal.SubmittedAt.ToString("g")</td>
                                         <td>@proposal.TargetOfficeRole</td>

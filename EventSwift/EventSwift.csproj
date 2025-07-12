@@ -190,6 +190,10 @@
     <Compile Include="Migrations\202507071537499_Followup.Designer.cs">
       <DependentUpon>202507071537499_Followup.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202507121215363_ProposalTracking.cs" />
+    <Compile Include="Migrations\202507121215363_ProposalTracking.Designer.cs">
+      <DependentUpon>202507121215363_ProposalTracking.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActivityLog.cs" />
     <Compile Include="Models\ClientDashboardViewModel.cs" />
@@ -203,6 +207,7 @@
     <Compile Include="Models\ProposalCalendarViewModel.cs" />
     <Compile Include="Models\ProposalFeedback.cs" />
     <Compile Include="Models\ProposalSummaryVM.cs" />
+    <Compile Include="Models\ProposalTracking.cs" />
     <Compile Include="Models\Statistics.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -340,6 +345,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202507071537499_Followup.resx">
       <DependentUpon>202507071537499_Followup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202507121215363_ProposalTracking.resx">
+      <DependentUpon>202507121215363_ProposalTracking.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -36,6 +36,12 @@
             </div>
         </div>
 
+        <div class="d-flex justify-content-end mb-4">
+            <a href="@Url.Action("ApprovalsIndex")" class="btn btn-outline-custom">
+                <i class="bi bi-arrow-left me-2"></i>Back to Events
+            </a>
+        </div>
+
         <div class="row g-4">
             <!-- Proposal Details Card -->
             <div class="col-lg-6">
@@ -53,16 +59,20 @@
                             <dd class="col-sm-7">
                                 @if (Model.EventProposal.Status == "Approved")
                                 {
-                                    <span class="badge" style="background: var(--green); color: #fff;">Approved</span>
+                                    <span class="badge" style="background: var(--green); color: #fff;">VPA Approved</span>
+                                }
+                                else if (Model.EventProposal.Status == "Reviewed")
+                                {
+                                    <span class="badge" style="background: #17a2b8; color: #fff;">For Approval VPA</span>
                                 }
                                 else if (Model.EventProposal.Status == "Pending")
                                 {
-                                    <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
+                                    <span class="badge" style="background: var(--orange); color: #fff;">For Approval @Model.EventProposal.TargetOfficeRole</span>
                                 }
-                                                            else if (Model.EventProposal.Status == "Rejected")
-                            {
-                                <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
-                            }
+                                else if (Model.EventProposal.Status == "Rejected")
+                                {
+                                    <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
+                                }
                                 else
                                 {
                                     <span class="badge bg-secondary">@Model.EventProposal.Status</span>
@@ -80,19 +90,22 @@
                                 }
                                 else if (Model.Status == "Pending")
                                 {
-                                    <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
+                                    <span class="badge" style="background: var(--orange); color: #fff;">For Approval @Model.Office</span>
                                 }
-                                                            else if (Model.Status == "Rejected")
-                            {
-                                <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
-                            }
+                                else if (Model.Status == "Rejected")
+                                {
+                                    <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
+                                }
                                 else
                                 {
                                     <span class="badge bg-secondary">@Model.Status</span>
                                 }
                             </dd>
-                            <dt class="col-sm-5">Action Date</dt>
-                            <dd class="col-sm-7">@((Model.ActionDate.HasValue) ? Model.ActionDate.Value.ToString("g") : "Pending")</dd>
+                            @if (Model.Office == "VPA" && Model.ActionDate.HasValue)
+                            {
+                                <dt class="col-sm-5">Action Date</dt>
+                                <dd class="col-sm-7">@Model.ActionDate.Value.ToString("g")</dd>
+                            }
                             <dt class="col-sm-5">Document File</dt>
                             <dd class="col-sm-7">
                                 <a href="@Url.Content(Model.EventProposal.FilePath)" target="_blank" class="btn btn-sm btn-outline-custom me-2 mb-1"><i class="bi bi-eye"></i> View</a>
@@ -112,7 +125,7 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            @if (isVPA)
+                            @if (Model.Office == "VPA" && Model.EventProposal.TargetOfficeRole == "VPA")
                             {
                                 <div class="alert alert-info mb-3">
                                     <i class="bi bi-info-circle me-1"></i>
@@ -249,7 +262,7 @@
         const selectedEventDate = document.getElementById('selectedEventDate');
         const modalEventDate = document.getElementById('modalEventDate');
         const modalEventTime = document.getElementById('modalEventTime');
-        const isVPA = @(isVPA ? "true" : "false");
+        const isVPAOffice = @(Model.Office == "VPA" && Model.EventProposal.TargetOfficeRole == "VPA" ? "true" : "false");
 
         if (rejectToggle) {
             rejectToggle.addEventListener('change', function () {
@@ -284,8 +297,8 @@
         // Handle approve button click
         if (approveBtn) {
             approveBtn.addEventListener('click', function (e) {
-                if (isVPA) {
-                    // For VPA, validate date and time first
+                if (isVPAOffice) {
+                    // For VPA office, validate date and time first
                     if (!modalEventDate.value) {
                         alert('Please select an event date before approving.');
                         modalEventDate.focus();
@@ -305,7 +318,7 @@
                     const approveModal = new bootstrap.Modal(document.getElementById('approveModal'));
                     approveModal.show();
                 } else {
-                    // For non-VPA, show approval modal directly
+                    // For non-VPA office, show approval modal directly
                     const approveModal = new bootstrap.Modal(document.getElementById('approveModal'));
                     approveModal.show();
                 }

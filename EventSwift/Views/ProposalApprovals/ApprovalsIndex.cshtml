@@ -69,28 +69,57 @@
                                             <i class="bi bi-calendar-event me-1" style="color: var(--green);"></i>@ev.Title
                                         </td>
                                         <td>
-                                            @if (ev.Status == "Approved")
-                                            {
-                                                <span class="badge" style="background: var(--green); color: #fff;">Approved</span>
+                                            @{
+                                                var statusBadgeClass = "";
+                                                var statusText = ev.Status;
+                                                
+                                                if (ev.Status == "Approved")
+                                                {
+                                                    statusBadgeClass = "badge";
+                                                    statusText = "Approved";
+                                                }
+                                                else if (ev.Status == "Pending")
+                                                {
+                                                    statusBadgeClass = "badge";
+                                                    statusText = "For Approval";
+                                                }
+                                                else if (ev.Status == "Rejected")
+                                                {
+                                                    statusBadgeClass = "badge";
+                                                    statusText = "Returned";
+                                                }
+                                                else
+                                                {
+                                                    statusBadgeClass = "badge bg-secondary";
+                                                }
                                             }
-                                            else if (ev.Status == "Pending")
-                                            {
-                                                <span class="badge" style="background: var(--orange); color: #fff;">Pending</span>
-                                            }
-                                            else if (ev.Status == "Rejected")
-                                            {
-                                                <span class="badge" style="background: var(--brown); color: #fff;">Returned</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-secondary">@ev.Status</span>
-                                            }
+                                            <span class="@statusBadgeClass" style="@(ev.Status == "Approved" ? "background: var(--green); color: #fff;" : 
+                                                                                    ev.Status == "Pending" ? "background: var(--orange); color: #fff;" : 
+                                                                                    ev.Status == "Rejected" ? "background: var(--brown); color: #fff;" : "")">
+                                                @statusText
+                                            </span>
                                         </td>
                                         <td>
                                             <div class="d-flex gap-2">
-                                                <a href="@Url.Action("EventDetails", "ProposalApprovals", new { id = ev.EventId })" class="btn btn-sm btn-custom px-3 d-inline-flex align-items-center gap-1">
-                                                    <i class="bi bi-eye"></i> View
-                                                </a>
+                                                @if (User.Identity.IsAuthenticated)
+                                                {
+                                                    using (var db = new EventSwift.Models.DefaultConnection())
+                                                    {
+                                                        var user = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
+                                                        if (user?.Role == "VPA")
+                                                        {
+                                                            <a href="@Url.Action("VPAEventOverview", "ProposalApprovals", new { id = ev.EventId })" class="btn btn-sm btn-warning px-3 d-inline-flex align-items-center gap-1">
+                                                                <i class="bi bi-building"></i> VPA Overview
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a href="@Url.Action("EventDetails", "ProposalApprovals", new { id = ev.EventId })" class="btn btn-sm btn-custom px-3 d-inline-flex align-items-center gap-1">
+                                                                <i class="bi bi-eye"></i> View
+                                                            </a>
+                                                        }
+                                                    }
+                                                }
                                                 <button type="button" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1" onclick="confirmDelete(@ev.EventId)">
                                                     <i class="bi bi-trash"></i> Delete
                                                 </button>

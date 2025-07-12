@@ -43,6 +43,8 @@ namespace EventSwift.Models
                 .HasForeignKey(e => e.ClientId)
                 .WillCascadeOnDelete(false);
 
+
+
             base.OnModelCreating(modelBuilder);
         }
     }

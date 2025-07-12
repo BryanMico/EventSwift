@@ -111,14 +111,38 @@
                                         </div>
                                     </div>
                                     <div class="ms-3">
-                                        <span class="badge rounded-pill px-3 py-2 fw-semibold
-                                            @(proposal.Status == "Pending" ? "bg-warning text-dark" :
-                                              proposal.Status == "Approved" ? "bg-success" :
-                                              proposal.Status == "Rejected" ? "bg-danger" : "bg-secondary")">
-                                            <i class="bi @(proposal.Status == "Pending" ? "bi-clock" : 
-                                                         proposal.Status == "Approved" ? "bi-check-circle" : 
-                                                         proposal.Status == "Rejected" ? "bi-x-circle" : "bi-question-circle") me-1"></i>
-                                            @proposal.Status
+                                        @{
+                                            var statusBadgeClass = "";
+                                            var statusIcon = "";
+                                            var statusText = proposal.Status;
+                                            
+                                            if (proposal.Status == "Pending")
+                                            {
+                                                statusBadgeClass = "bg-warning text-dark";
+                                                statusIcon = "bi-clock";
+                                                statusText = "For Approval";
+                                            }
+                                            else if (proposal.Status == "Approved")
+                                            {
+                                                statusBadgeClass = "bg-success";
+                                                statusIcon = "bi-check-circle";
+                                                statusText = "Approved";
+                                            }
+                                            else if (proposal.Status == "Rejected")
+                                            {
+                                                statusBadgeClass = "bg-danger";
+                                                statusIcon = "bi-x-circle";
+                                                statusText = "Returned";
+                                            }
+                                            else
+                                            {
+                                                statusBadgeClass = "bg-secondary";
+                                                statusIcon = "bi-question-circle";
+                                            }
+                                        }
+                                        <span class="badge rounded-pill px-3 py-2 fw-semibold @statusBadgeClass">
+                                            <i class="bi @statusIcon me-1"></i>
+                                            @statusText
                                         </span>
                                     </div>
                                 </div>

@@ -66,6 +66,21 @@ namespace EventSwift.Controllers
             return View(proposals);
         }
 
+        public ActionResult VPAEventOverview(int id)
+        {
+            var currentUser = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
+            if (currentUser == null || currentUser.Role != "VPA")
+                return HttpNotFound("Access denied. VPA access only.");
+
+            var ev = db.Events
+                .Include(e => e.Proposals.Select(p => p.Approvals))
+                .FirstOrDefault(e => e.EventId == id);
+            if (ev == null)
+                return HttpNotFound();
+
+            return View(ev);
+        }
+
         public ActionResult Details(int id)
         {
             var approval = db.ProposalApprovals.Find(id);
@@ -133,8 +148,42 @@ namespace EventSwift.Controllers
                 approval.Status = "Approved";
                 approval.ActionDate = DateTime.Now;
                 
-                // Set proposal status to "Approved" since this office has approved it
-                approval.EventProposal.Status = "Approved";
+                // Set proposal status based on office
+                if (approval.Office == "VPA")
+                {
+                    approval.EventProposal.Status = "Approved";
+                }
+                else
+                {
+                    approval.EventProposal.Status = "Reviewed";
+                }
+
+                // If VPAA, VPF, or AMU approves, forward to VPA
+                if (approval.Office == "VPAA" || approval.Office == "VPF" || approval.Office == "AMU")
+                {
+                    // Create new approval for VPA
+                    var vpaApproval = new ProposalApproval
+                    {
+                        EventProposalId = approval.EventProposalId,
+                        Office = "VPA",
+                        Status = "Pending",
+                        ActionDate = null
+                    };
+                    db.ProposalApprovals.Add(vpaApproval);
+
+                    // Notify VPA users
+                    var vpaUsers = db.Users.Where(u => u.Role == "VPA").ToList();
+                    foreach (var user in vpaUsers)
+                    {
+                        db.Notifications.Add(new Notification
+                        {
+                            Username = user.Username,
+                            Message = $"A document '{approval.EventProposal.Title}' has been approved by {approval.Office} and forwarded to you for review.",
+                            IsRead = false,
+                            CreatedAt = DateTime.Now
+                        });
+                    }
+                }
 
                 // If VPA is approving, set the event date
                 if (approval.Office == "VPA" && eventDate.HasValue)
@@ -179,6 +228,8 @@ namespace EventSwift.Controllers
                 approval.Status = "Rejected";
                 approval.ActionDate = DateTime.Now;
                 approval.EventProposal.Status = "Rejected";
+
+
 
                 var feedback = new ProposalFeedback
                 {
