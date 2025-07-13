@@ -1,0 +1,535 @@
+@{
+    ViewBag.Title = "Welcome to EventSwift";
+    ViewBag.SkipNavbar = true;
+}
+
+<div class="front-page-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row align-items-center" style="min-height: 80vh;">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <div class="hero-logo mb-4 animate-logo">
+                            <img src="~/Content/Images/eventswift_logo.png" alt="EventSwift Logo" class="hero-logo-img" />
+                            <div class="logo-glow"></div>
+                        </div>
+                        <h1 class="hero-title mb-4 animate-title">
+                            Welcome to EventSwift
+                        </h1>
+
+                        <div class="hero-actions">
+                            <a href="@Url.Action("Login", "Account")" class="btn btn-primary btn-lg login-btn animate-btn">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Login to EventSwift
+                                <div class="btn-shine"></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-visual">
+                        <div class="floating-card card-1 glow-card">
+                            <i class="bi bi-calendar-event pulse-icon"></i>
+                            <span>Event Planning</span>
+                            <div class="card-particles"></div>
+                        </div>
+                        <div class="floating-card card-2 glow-card">
+                            <i class="bi bi-file-earmark-check pulse-icon"></i>
+                            <span>Document Approval</span>
+                            <div class="card-particles"></div>
+                        </div>
+                        <div class="floating-card card-3 glow-card">
+                            <i class="bi bi-people pulse-icon"></i>
+                            <span>Team Coordination</span>
+                            <div class="card-particles"></div>
+                        </div>
+                        <div class="background-particles"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Footer -->
+    <footer class="front-footer text-center py-4">
+        <div class="container">
+            <div class="footer-partnership-compact">
+                <span class="footer-partnership-heading">In Partnership With</span>
+                <img src="~/Content/Images/wup_logo.png" alt="WUP Logo" class="footer-logo-img" />
+                <img src="~/Content/Images/cect_logo.png" alt="CECT Logo" class="footer-logo-img" />
+            </div>
+            <p class="mb-0 text-white">&copy; @DateTime.Now.Year - EventSwift. All rights reserved.</p>
+        </div>
+    </footer>
+</div>
+
+<style>
+.front-page-container {
+    height: 100vh;
+    background: linear-gradient(135deg, #eeedc2 0%, #f3a750 50%, #ff8c42 100%);
+    overflow-x: hidden;
+    position: relative;
+    overflow-y: hidden;
+}
+
+.front-page-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    pointer-events: none;
+    animation: grain 20s linear infinite;
+}
+
+.hero-section {
+    padding: 0.5rem 0 2rem 0;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-content {
+    padding: 1rem 0;
+}
+
+.hero-logo {
+    position: relative;
+    display: inline-block;
+}
+
+.hero-logo-img {
+    height: 80px;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+.logo-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(0,103,63,0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--green);
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.text-highlight {
+    background: linear-gradient(45deg, #ffffff, #f8f9fa, #ffffff);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease infinite;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-features {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    color: var(--green);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.feature-item:hover {
+    background: rgba(255,255,255,0.95);
+    transform: translateX(10px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.login-btn {
+    background: linear-gradient(45deg, var(--green), #008a5a, #00b894);
+    background-size: 200% 200%;
+    border: none;
+    padding: 1.2rem 2.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0, 103, 63, 0.4);
+    transition: all 0.4s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    animation: gradientShift 3s ease infinite;
+}
+
+.login-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(0, 103, 63, 0.6);
+    background-position: right center;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+.login-btn:hover .btn-shine {
+    left: 100%;
+}
+
+.hero-visual {
+    position: relative;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-card {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 1.5rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 150px;
+    animation: float 6s ease-in-out infinite;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+    color: var(--green);
+}
+
+.floating-card:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.floating-card i {
+    font-size: 2.5rem;
+    color: var(--green);
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.floating-card span {
+    font-weight: 600;
+    color: var(--green);
+    font-size: 0.9rem;
+}
+
+.card-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.card-particles::before,
+.card-particles::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: particleFloat 4s ease-in-out infinite;
+}
+
+.card-particles::before {
+    top: 20%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.card-particles::after {
+    top: 60%;
+    right: 20%;
+    animation-delay: 2s;
+}
+
+.background-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.background-particles::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(0,103,63,0.1) 1px, transparent 1px),
+        radial-gradient(circle at 80% 70%, rgba(243,167,80,0.1) 1px, transparent 1px),
+        radial-gradient(circle at 40% 80%, rgba(255,140,66,0.1) 1px, transparent 1px);
+    background-size: 50px 50px, 30px 30px, 40px 40px;
+    animation: particleMove 20s linear infinite;
+}
+
+.card-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.card-2 {
+    top: 50%;
+    right: 15%;
+    animation-delay: 2s;
+}
+
+.card-3 {
+    bottom: 20%;
+    left: 20%;
+    animation-delay: 4s;
+}
+
+.glow-card {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 0 20px rgba(0,103,63,0.2);
+}
+
+.glow-card:hover {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2), 0 0 30px rgba(0,103,63,0.4);
+}
+
+@@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-25px) rotate(2deg); }
+}
+
+@@keyframes logoFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@@keyframes glow {
+    0% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@@keyframes particleFloat {
+    0%, 100% { transform: translateY(0px) scale(1); opacity: 0.7; }
+    50% { transform: translateY(-10px) scale(1.2); opacity: 1; }
+}
+
+@@keyframes particleMove {
+    0% { transform: translateX(0px) translateY(0px); }
+    100% { transform: translateX(-50px) translateY(-30px); }
+}
+
+@@keyframes grain {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-5%, -5%); }
+    20% { transform: translate(-10%, 5%); }
+    30% { transform: translate(5%, -10%); }
+    40% { transform: translate(-5%, 15%); }
+    50% { transform: translate(-10%, 5%); }
+    60% { transform: translate(15%, 0%); }
+    70% { transform: translate(0%, 10%); }
+    80% { transform: translate(3%, 15%); }
+    90% { transform: translate(-10%, 10%); }
+}
+
+.animate-logo {
+    animation: fadeInDown 1s ease-out;
+}
+
+.animate-title {
+    animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+.animate-text {
+    animation: fadeInUp 1s ease-out 0.6s both;
+}
+
+.animate-feature {
+    animation: slideInLeft 0.8s ease-out both;
+}
+
+.animate-btn {
+    animation: fadeInUp 1s ease-out 0.9s both;
+}
+
+.pulse-icon {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.features-section {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+    height: 100%;
+    border: 1px solid rgba(255,255,255,0.3);
+    backdrop-filter: blur(10px);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: var(--green);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.feature-card h4 {
+    color: var(--green);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.feature-card p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.front-footer {
+    background: rgba(0, 0, 0, 0.1);
+    color: #666;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+}
+
+.footer-partnership-compact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-bottom: 0.2rem;
+}
+.footer-partnership-heading {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--green);
+    margin-bottom: 0;
+    letter-spacing: 0.5px;
+}
+.footer-partners {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+.footer-logo-img {
+    height: 28px;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.10));
+}
+
+@@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .floating-card {
+        min-width: 120px;
+        padding: 1rem;
+    }
+    
+    .floating-card i {
+        font-size: 1.8rem;
+    }
+    
+    .floating-card span {
+        font-size: 0.8rem;
+    }
+    
+    .login-btn {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+}
+</style> 

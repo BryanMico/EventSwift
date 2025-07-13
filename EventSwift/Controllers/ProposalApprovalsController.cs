@@ -104,7 +104,7 @@ namespace EventSwift.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Action(int id, string action, string feedbackMessage, DateTime? eventDate, string approvalPassword, string signatureData)
+        public ActionResult Action(int id, string action, string feedbackMessage, DateTime? eventDate, string eventVenue, string approvalPassword, string signatureData)
         {
             var approval = db.ProposalApprovals
                    .Include(a => a.EventProposal)
@@ -185,10 +185,14 @@ namespace EventSwift.Controllers
                     }
                 }
 
-                // If VPA is approving, set the event date
+                // If VPA is approving, set the event date and venue
                 if (approval.Office == "VPA" && eventDate.HasValue)
                 {
                     approval.EventProposal.Event.ApprovedDate = eventDate.Value;
+                    if (!string.IsNullOrEmpty(eventVenue))
+                    {
+                        approval.EventProposal.Event.Venue = eventVenue;
+                    }
                 }
 
                 // Stamp signature and text on PDF if the file is a PDF

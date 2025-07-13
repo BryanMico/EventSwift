@@ -1,7 +1,7 @@
-﻿@model EventSwift.Models.EventProposal
+@model EventSwift.Models.EventProposal
 
 @{
-    ViewBag.Title = "Resubmit Document";
+    ViewBag.Title = "Edit Document";
     ViewBag.SkipNavbar = true;
 }
 
@@ -17,7 +17,7 @@
             </a>
         </div>
 
-        @Html.Partial("~/Views/Shared/_SectionHeader.cshtml", new ViewDataDictionary { { "Icon", "bi-arrow-repeat" }, { "Text", "Resubmit Document" }, { "Color", "var(--green)" } })
+        @Html.Partial("~/Views/Shared/_SectionHeader.cshtml", new ViewDataDictionary { { "Icon", "bi-pencil" }, { "Text", "Edit Document" }, { "Color", "var(--green)" } })
 
         <div class="row">
             <div class="col-lg-8">
@@ -32,35 +32,26 @@
                             </div>
                             <div class="col-md-6">
                                 <h6 class="text-muted mb-2">Current Status</h6>
-                                <span class="badge" style="background: var(--brown); color: #fff;">
-                                    <i class="bi bi-x-circle me-1"></i>Returned
+                                <span class="badge" style="background: var(--orange); color: #fff;">
+                                    <i class="bi bi-clock me-1"></i>Pending Review
                                 </span>
                             </div>
                         </div>
 
-                        @if (Model.Feedbacks != null && Model.Feedbacks.Any())
-                        {
-                            <div class="alert alert-warning mb-4">
-                                <h6 class="mb-3" style="color: var(--green);">
-                                    <i class="bi bi-chat-dots me-2"></i>Feedback from Offices
-                                </h6>
-                                @foreach (var fb in Model.Feedbacks)
-                                {
-                                    <div class="mb-3">
-                                        <strong>@fb.Office Office:</strong>
-                                        <p class="mb-1">@fb.Feedback</p>
-                                        <small class="text-muted">
-                                            <i class="bi bi-clock me-1"></i>@fb.FeedbackDate.ToString("g")
-                                        </small>
-                                    </div>
-                                }
-                            </div>
-                        }
+                        <div class="alert alert-info mb-4">
+                            <h6 class="mb-3" style="color: var(--green);">
+                                <i class="bi bi-info-circle me-2"></i>Current Document
+                            </h6>
+                            <p class="mb-2"><strong>Current File:</strong> @Path.GetFileName(Model.FilePath)</p>
+                            <a href="@Model.FilePath" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye me-1"></i>View Current Document
+                            </a>
+                        </div>
 
                         <hr />
 
                         <h6 class="text-muted mb-3">
-                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload Corrected Document
+                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload New Document
                         </h6>
 
                         @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -71,18 +62,18 @@
                                 <div class="custom-file-input">
                                     <input type="file" name="uploadedFile" id="uploadedFile" class="form-control" accept=".pdf" required style="display: none;" />
                                     <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('uploadedFile').click();">
-                                        <i class="bi bi-file-earmark-arrow-up me-2"></i>Select PDF File
+                                        <i class="bi bi-file-earmark-arrow-up me-2"></i>Select New PDF File
                                     </button>
                                     <span id="file-name" class="ms-2 text-muted small d-block mt-2"></span>
                                 </div>
                                 <small class="form-text text-muted">
-                                    <i class="bi bi-info-circle me-1"></i>Please upload a PDF file with the corrections based on the feedback provided above.
+                                    <i class="bi bi-info-circle me-1"></i>Upload a new PDF file to replace the current document. The old file will be deleted.
                                 </small>
                             </div>
 
                             <div class="d-flex justify-content-end">
                                 <button type="submit" class="btn text-white" style="background-color: var(--green);">
-                                    <i class="bi bi-arrow-repeat me-2"></i>Resubmit Document
+                                    <i class="bi bi-pencil me-2"></i>Update Document
                                 </button>
                             </div>
                         }
@@ -94,22 +85,18 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-header" style="background-color: var(--light-yellow);">
                         <h6 class="mb-0" style="color: var(--green);">
-                            <i class="bi bi-info-circle me-2"></i>Resubmission Guidelines
+                            <i class="bi bi-info-circle me-2"></i>Edit Guidelines
                         </h6>
                     </div>
                     <div class="card-body">
                         <ul class="list-unstyled">
                             <li class="mb-2">
                                 <i class="bi bi-check-circle text-success me-2"></i>
-                                Review all feedback carefully
+                                Only pending documents can be edited
                             </li>
                             <li class="mb-2">
                                 <i class="bi bi-check-circle text-success me-2"></i>
-                                Make necessary corrections
-                            </li>
-                            <li class="mb-2">
-                                <i class="bi bi-check-circle text-success me-2"></i>
-                                Ensure document is complete
+                                The old file will be permanently deleted
                             </li>
                             <li class="mb-2">
                                 <i class="bi bi-check-circle text-success me-2"></i>
@@ -117,7 +104,11 @@
                             </li>
                             <li class="mb-2">
                                 <i class="bi bi-check-circle text-success me-2"></i>
-                                Document will be reviewed again
+                                Document will remain in pending status
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                No approval process will be restarted
                             </li>
                         </ul>
                     </div>
@@ -157,4 +148,4 @@
             }
         });
     </script>
-}
+} 

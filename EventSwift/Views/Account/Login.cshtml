@@ -45,17 +45,38 @@
     </script>
 }
 
-@using (Html.BeginForm("Login", "Account", FormMethod.Post))
+@using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "loginForm" }))
 {
     <div class="mb-3">
         @Html.LabelFor(m => m.Username, new { @class = "form-label fw-semibold", style = "color: var(--green); font-size: 0.95rem;" })
-        @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-lg", placeholder = "Enter username", style = "border-radius: 0.35rem; font-size: 0.95rem;" })
+        @Html.TextBoxFor(m => m.Username, new { @class = "form-control form-control-lg", placeholder = "Enter username", style = "border-radius: 0.35rem; font-size: 0.95rem;", required = "required" })
     </div>
 
     <div class="mb-3">
         @Html.LabelFor(m => m.Password, new { @class = "form-label fw-semibold", style = "color: var(--green); font-size: 0.95rem;" })
-        @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-lg", placeholder = "Enter password", style = "border-radius: 0.35rem; font-size: 0.95rem;" })
+        @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-lg", placeholder = "Enter password", style = "border-radius: 0.35rem; font-size: 0.95rem;", required = "required" })
     </div>
 
-    <button type="submit" class="btn btn-custom w-100 mt-2">Login</button>
+    <button type="submit" class="btn btn-custom w-100 mt-2" id="loginBtn">Login</button>
 }
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    var username = document.querySelector('input[name="Username"]').value.trim();
+    var password = document.querySelector('input[name="Password"]').value.trim();
+    
+    if (!username) {
+        e.preventDefault();
+        alert('Please enter your username.');
+        document.querySelector('input[name="Username"]').focus();
+        return false;
+    }
+    
+    if (!password) {
+        e.preventDefault();
+        alert('Please enter your password.');
+        document.querySelector('input[name="Password"]').focus();
+        return false;
+    }
+});
+</script>

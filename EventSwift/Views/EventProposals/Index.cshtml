@@ -21,31 +21,110 @@
 
         <!-- Propose an Event Modal -->
         <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
-              <div class="modal-header">
+              <div class="modal-header" style="background-color: var(--green); color: white;">
                 <h5 class="modal-title" id="createEventModalLabel">
-                    <i class="bi bi-plus-circle me-2" style="color: var(--green);"></i> Propose New Event
+                    <i class="bi bi-plus-circle me-2"></i> Create New Event with Documents
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                @using (Html.BeginForm("CreateEvent", "EventProposals", FormMethod.Post, new { id = "createEventForm" }))
+                @using (Html.BeginForm("CreateEvent", "EventProposals", FormMethod.Post, new { id = "createEventForm", enctype = "multipart/form-data" }))
                 {
                     @Html.AntiForgeryToken()
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="color: var(--green);" for="Title">
-                            <i class="bi bi-type me-1"></i> Event Title
-                        </label>
-                        @Html.TextBox("Title", null, new { @class = "form-control", placeholder = "Enter event title" })
-                        @Html.ValidationMessage("Title", "", new { @class = "text-danger" })
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold" style="color: var(--green);" for="Title">
+                                <i class="bi bi-type me-1"></i> Event Title
+                            </label>
+                            @Html.TextBox("Title", null, new { @class = "form-control", placeholder = "Enter event title", required = "required" })
+                            @Html.ValidationMessage("Title", "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0" style="background-color: #f8f9fa;">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary mb-3">
+                                        <i class="bi bi-building me-2"></i>VPAA Office
+                                    </h6>
+                                    <div class="custom-file-input">
+                                        <input type="file" name="VPAAFile" id="VPAAFile" class="form-control" accept=".pdf" style="display: none;" />
+                                        <button type="button" class="btn btn-outline-primary w-100" onclick="document.getElementById('VPAAFile').click();">
+                                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload VPAA Document
+                                        </button>
+                                        <span id="VPAA-file-name" class="ms-2 text-muted small d-block mt-2"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0" style="background-color: #f8f9fa;">
+                                <div class="card-body">
+                                    <h6 class="card-title text-success mb-3">
+                                        <i class="bi bi-building me-2"></i>VPF Office
+                                    </h6>
+                                    <div class="custom-file-input">
+                                        <input type="file" name="VPFFile" id="VPFFile" class="form-control" accept=".pdf" style="display: none;" />
+                                        <button type="button" class="btn btn-outline-success w-100" onclick="document.getElementById('VPFFile').click();">
+                                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload VPF Document
+                                        </button>
+                                        <span id="VPF-file-name" class="ms-2 text-muted small d-block mt-2"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0" style="background-color: #f8f9fa;">
+                                <div class="card-body">
+                                    <h6 class="card-title text-warning mb-3">
+                                        <i class="bi bi-building me-2"></i>AMU Office
+                                    </h6>
+                                    <div class="custom-file-input">
+                                        <input type="file" name="AMUFile" id="AMUFile" class="form-control" accept=".pdf" style="display: none;" />
+                                        <button type="button" class="btn btn-outline-warning w-100" onclick="document.getElementById('AMUFile').click();">
+                                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload AMU Document
+                                        </button>
+                                        <span id="AMU-file-name" class="ms-2 text-muted small d-block mt-2"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0" style="background-color: #f8f9fa;">
+                                <div class="card-body">
+                                    <h6 class="card-title text-danger mb-3">
+                                        <i class="bi bi-building me-2"></i>VPA Office
+                                    </h6>
+                                    <div class="custom-file-input">
+                                        <input type="file" name="VPAFile" id="VPAFile" class="form-control" accept=".pdf" style="display: none;" />
+                                        <button type="button" class="btn btn-outline-danger w-100" onclick="document.getElementById('VPAFile').click();">
+                                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload VPA Document
+                                        </button>
+                                        <span id="VPA-file-name" class="ms-2 text-muted small d-block mt-2"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Note:</strong> Documents sent to VPAA/VPF/AMU will be automatically forwarded to VPA after approval. VPA documents go directly to VPA.
                     </div>
                 }
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="submit" form="createEventForm" class="btn btn-custom d-flex align-items-center gap-2">
-                    <i class="bi bi-plus-circle"></i> Propose an Event
+                    <i class="bi bi-plus-circle"></i> Create Event
                 </button>
               </div>
             </div>
@@ -104,3 +183,44 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // File input handling for modal
+            const fileInputs = {
+                'VPAAFile': 'VPAA-file-name',
+                'VPFFile': 'VPF-file-name',
+                'AMUFile': 'AMU-file-name',
+                'VPAFile': 'VPA-file-name'
+            };
+
+            Object.keys(fileInputs).forEach(function(inputId) {
+                var fileInput = document.getElementById(inputId);
+                var fileNameSpan = document.getElementById(fileInputs[inputId]);
+                
+                if (fileInput) {
+                    fileInput.addEventListener('change', function() {
+                        if (this.files.length > 0) {
+                            var file = this.files[0];
+                            var fileName = file.name;
+                            var fileExtension = fileName.split('.').pop().toLowerCase();
+                            
+                            // Check if file is PDF
+                            if (fileExtension !== 'pdf') {
+                                alert('Only PDF files are allowed. Please select a PDF file.');
+                                this.value = ''; // Clear the file input
+                                fileNameSpan.textContent = '';
+                                return;
+                            }
+                            
+                            fileNameSpan.textContent = fileName;
+                        } else {
+                            fileNameSpan.textContent = '';
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

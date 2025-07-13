@@ -34,7 +34,7 @@ namespace EventSwift.Controllers
         // POST: EventProposals/CreateEvent
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateEvent(Event model)
+        public ActionResult CreateEvent(EventSwift.Models.CreateEventViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -45,14 +45,98 @@ namespace EventSwift.Controllers
                     return View(model);
                 }
 
-                model.Status = "Pending";
-                model.ClientId = currentUser.UserId;
+                // Create the event
+                var eventItem = new Event
+                {
+                    Title = model.Title,
+                    Status = "Pending",
+                    ClientId = currentUser.UserId
+                };
 
-                db.Events.Add(model);
+                db.Events.Add(eventItem);
                 db.SaveChanges();
 
-                // Redirect to the event details page, or to the proposal creation page for this event
-                return RedirectToAction("Details", new { id = model.EventId });
+                // Process file uploads for each office
+                var offices = new[] { "VPAA", "VPF", "AMU", "VPA" };
+                var fileProperties = new[] { model.VPAAFile, model.VPFFile, model.AMUFile, model.VPAFile };
+
+                for (int i = 0; i < offices.Length; i++)
+                {
+                    var file = fileProperties[i];
+                    var office = offices[i];
+
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        // Validate file type
+                        string fileExtension = Path.GetExtension(file.FileName).ToLower();
+                        if (fileExtension != ".pdf")
+                        {
+                            ModelState.AddModelError("", $"Only PDF files are allowed for {office} office.");
+                            return View(model);
+                        }
+
+                        // Save file
+                        string uploadFolder = Server.MapPath("~/Uploads");
+                        if (!Directory.Exists(uploadFolder))
+                        {
+                            Directory.CreateDirectory(uploadFolder);
+                        }
+
+                        string originalFileName = Path.GetFileName(file.FileName);
+                        string fileNameWithoutExt = Path.GetFileNameWithoutExtension(originalFileName);
+                        string fileExt = Path.GetExtension(originalFileName);
+                        
+                        // Create unique filename
+                        string uniqueFileName = $"{fileNameWithoutExt}_{office}_{eventItem.EventId}_{DateTime.Now:yyyyMMddHHmmss}{fileExt}";
+                        string path = Path.Combine(uploadFolder, uniqueFileName);
+                        file.SaveAs(path);
+
+                        // Create proposal for this office
+                        var proposal = new EventProposal
+                        {
+                            Title = $"{model.Title} - {office} Document",
+                            FilePath = "/Uploads/" + uniqueFileName,
+                            Status = "Pending",
+                            EventId = eventItem.EventId,
+                            ClientId = currentUser.UserId,
+                            TargetOfficeRole = office,
+                            SubmittedAt = DateTime.Now
+                        };
+
+                        db.EventProposals.Add(proposal);
+                        db.SaveChanges();
+
+                        // Create approval record
+                        var approval = new ProposalApproval
+                        {
+                            EventProposalId = proposal.EventProposalId,
+                            Office = office,
+                            Status = "Pending",
+                            ActionDate = null
+                        };
+
+                        db.ProposalApprovals.Add(approval);
+
+                        // Notify office users
+                        var officeUsers = db.Users.Where(u => u.Role == office).ToList();
+                        foreach (var user in officeUsers)
+                        {
+                            var notification = new Notification
+                            {
+                                Username = user.Username,
+                                Message = $"A new proposal titled '{proposal.Title}' has been submitted.",
+                                IsRead = false,
+                                CreatedAt = DateTime.Now
+                            };
+                            db.Notifications.Add(notification);
+                        }
+                    }
+                }
+
+                db.SaveChanges();
+
+                // Redirect to the event details page
+                return RedirectToAction("Details", new { id = eventItem.EventId });
             }
 
             return View(model);
@@ -327,6 +411,88 @@ namespace EventSwift.Controllers
             }
 
             return View(proposal);
+        }
+
+        // GET: EventProposals/Edit/5
+        public ActionResult Edit(int id)
+        {
+            var proposal = db.EventProposals.Find(id);
+            var currentUser = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
+
+            if (proposal == null || proposal.ClientId != currentUser.UserId)
+                return HttpNotFound();
+
+            if (proposal.Status != "Pending")
+            {
+                TempData["Error"] = "Only pending documents can be edited.";
+                return RedirectToAction("Details", new { id = proposal.EventId });
+            }
+
+            return View(proposal);
+        }
+
+        // POST: EventProposals/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, HttpPostedFileBase uploadedFile)
+        {
+            var proposal = db.EventProposals.Find(id);
+            var currentUser = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
+
+            if (proposal == null || proposal.ClientId != currentUser.UserId)
+                return HttpNotFound();
+
+            if (proposal.Status != "Pending")
+            {
+                TempData["Error"] = "Only pending documents can be edited.";
+                return RedirectToAction("Details", new { id = proposal.EventId });
+            }
+
+            if (uploadedFile != null && uploadedFile.ContentLength > 0)
+            {
+                string fileExtension = Path.GetExtension(uploadedFile.FileName).ToLower();
+
+                if (fileExtension != ".pdf")
+                {
+                    ModelState.AddModelError("uploadedFile", "Only PDF files are allowed.");
+                    return View(proposal);
+                }
+
+                string uploadFolder = Server.MapPath("~/Uploads");
+                if (!Directory.Exists(uploadFolder))
+                {
+                    Directory.CreateDirectory(uploadFolder);
+                }
+
+                // Delete the old file
+                string oldFilePath = Server.MapPath(proposal.FilePath);
+                if (System.IO.File.Exists(oldFilePath))
+                {
+                    System.IO.File.Delete(oldFilePath);
+                }
+
+                string originalFileName = Path.GetFileName(uploadedFile.FileName);
+                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(originalFileName);
+                string fileExt = Path.GetExtension(originalFileName);
+                
+                // Create unique filename for this edit
+                string uniqueFileName = $"{fileNameWithoutExt}_edit_{proposal.EventProposalId}_{DateTime.Now:yyyyMMddHHmmss}{fileExt}";
+                string path = Path.Combine(uploadFolder, uniqueFileName);
+                uploadedFile.SaveAs(path);
+                proposal.FilePath = "/Uploads/" + uniqueFileName;
+            }
+            else
+            {
+                ModelState.AddModelError("uploadedFile", "Please upload a file.");
+                return View(proposal);
+            }
+
+            proposal.SubmittedAt = DateTime.Now;
+
+            db.SaveChanges();
+
+            TempData["Success"] = "Document updated successfully.";
+            return RedirectToAction("Details", new { id = proposal.EventId });
         }
 
         // GET: EventProposals/Resubmit/5

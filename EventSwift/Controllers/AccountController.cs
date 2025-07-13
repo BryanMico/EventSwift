@@ -20,6 +20,20 @@ namespace EventSwift.Controllers
         [HttpPost]
         public ActionResult Login(LoginViewModel model)
         {
+            // Check for empty username
+            if (string.IsNullOrWhiteSpace(model.Username))
+            {
+                ViewBag.Error = "Username is required.";
+                return View(model);
+            }
+
+            // Check for empty password
+            if (string.IsNullOrWhiteSpace(model.Password))
+            {
+                ViewBag.Error = "Password is required.";
+                return View(model);
+            }
+
             if (!ModelState.IsValid)
             {   
                 ViewBag.Error = "Please fill in all required fields correctly.";
@@ -59,11 +73,10 @@ namespace EventSwift.Controllers
             return View(model);
         }
 
-
         public ActionResult Logout()
         {
             FormsAuthentication.SignOut();
-            return RedirectToAction("Login", "Account");
+            return RedirectToAction("Index", "Home");
         }
     }
 }

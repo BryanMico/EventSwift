@@ -38,6 +38,12 @@
                         <span class="me-3"><i class="bi bi-calendar-check me-1"></i> <strong>Proposed Event Date:</strong> <span class="badge bg-info text-dark">@Model.ApprovedDate.Value.ToString("MMMM dd, yyyy h:mm tt")</span></span>
                     </div>
                 }
+                @if (!string.IsNullOrEmpty(Model.Venue))
+                {
+                    <div class="mb-2">
+                        <span class="me-3"><i class="bi bi-geo-alt me-1"></i> <strong>Event Venue:</strong> <span class="badge bg-info text-dark">@Model.Venue</span></span>
+                    </div>
+                }
                 @if (Model.Status == "SentToPresident")
                 {
                     <div class="mt-3">
