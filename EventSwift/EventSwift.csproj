@@ -203,6 +203,18 @@
     <Compile Include="Migrations\202507131103515_EventVenue.Designer.cs">
       <DependentUpon>202507131103515_EventVenue.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202507141517339_NoDuplicate.cs" />
+    <Compile Include="Migrations\202507141517339_NoDuplicate.Designer.cs">
+      <DependentUpon>202507141517339_NoDuplicate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202507141520479_NoDuplicate1.cs" />
+    <Compile Include="Migrations\202507141520479_NoDuplicate1.Designer.cs">
+      <DependentUpon>202507141520479_NoDuplicate1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202507141522081_NoDuplicate11.cs" />
+    <Compile Include="Migrations\202507141522081_NoDuplicate11.Designer.cs">
+      <DependentUpon>202507141522081_NoDuplicate11.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ActivityLog.cs" />
     <Compile Include="Models\ClientDashboardViewModel.cs" />
@@ -290,7 +302,6 @@
     <Content Include="Views\ProposalApprovals\ApprovalsIndex.cshtml" />
     <Content Include="Views\ProposalApprovals\Details.cshtml" />
     <Content Include="Views\EventProposals\Resubmit.cshtml" />
-    <Content Include="Views\EventProposals\CreateEvent.cshtml" />
     <Content Include="Views\EventProposals\DetailProposal.cshtml" />
     <Content Include="Views\Dashboard\PresidentDashboard.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
@@ -366,6 +377,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202507131103515_EventVenue.resx">
       <DependentUpon>202507131103515_EventVenue.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202507141517339_NoDuplicate.resx">
+      <DependentUpon>202507141517339_NoDuplicate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202507141520479_NoDuplicate1.resx">
+      <DependentUpon>202507141520479_NoDuplicate1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202507141522081_NoDuplicate11.resx">
+      <DependentUpon>202507141522081_NoDuplicate11.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

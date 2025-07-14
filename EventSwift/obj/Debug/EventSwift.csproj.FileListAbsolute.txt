@@ -91,3 +91,6 @@ C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.csproj.C
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.csproj.CopyComplete
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.dll
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.pdb
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.Migrations.NoDuplicate.resources
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.Migrations.NoDuplicate1.resources
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.Migrations.NoDuplicate11.resources

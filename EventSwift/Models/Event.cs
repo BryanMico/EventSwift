@@ -23,6 +23,9 @@ namespace EventSwift.Models
         public string VPAFilePath { get; set; }
 
         public virtual ICollection<EventProposal> Proposals { get; set; }
+
+        // Add CreatedAt timestamp
+        public DateTime? CreatedAt { get; set; }
     }
 
     public class CreateEventViewModel

@@ -123,8 +123,11 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" form="createEventForm" class="btn btn-custom d-flex align-items-center gap-2">
-                    <i class="bi bi-plus-circle"></i> Create Event
+                <button type="submit" id="createEventSubmitBtn" form="createEventForm" class="btn btn-custom d-flex align-items-center gap-2">
+                    <span id="createEventSpinner" class="d-none" role="status" aria-hidden="true">
+                        <span class="spinner-border spinner-border-sm me-2 only-spinner" style="vertical-align: middle;"></span>
+                    </span>
+                    <i class="bi bi-plus-circle"></i> <span class="spinner-text">Create Event</span>
                 </button>
               </div>
             </div>
@@ -221,6 +224,34 @@
                     });
                 }
             });
+
+            // Add loading spinner and disable button on submit
+            var createEventForm = document.getElementById('createEventForm');
+            var submitBtn = document.getElementById('createEventSubmitBtn');
+            var spinner = document.getElementById('createEventSpinner');
+            if (createEventForm && submitBtn && spinner) {
+                createEventForm.addEventListener('submit', function(e) {
+                    // Show spinner and disable button
+                    spinner.classList.remove('d-none');
+                    submitBtn.setAttribute('disabled', 'disabled');
+                    submitBtn.querySelector('.spinner-text').textContent = 'Creating...';
+                });
+                // Optional: If you want to re-enable if validation fails (client-side), you can listen for invalid events
+                createEventForm.addEventListener('invalid', function(e) {
+                    spinner.classList.add('d-none');
+                    submitBtn.removeAttribute('disabled');
+                    submitBtn.querySelector('.spinner-text').textContent = 'Create Event';
+                }, true);
+            }
         });
     </script>
+    <style>
+        /* Ensure only the spinner spins, not the text */
+        .spinner-text {
+            animation: none !important;
+        }
+        .only-spinner {
+            animation: var(--bs-spinner-animation-speed) linear infinite var(--bs-spinner-animation-name) !important;
+        }
+    </style>
 }
