@@ -37,7 +37,7 @@
 
     @if (ViewContext.RouteData.Values["controller"].ToString() == "Account" && ViewContext.RouteData.Values["action"].ToString() == "Login")
     {
-        <main class="container-fluid px-0 d-flex align-items-start main-area" style="min-height: 100vh;">
+        <main class="container-fluid px-0 d-flex align-items-start main-area" style="min-height: 100vh; margin-top: 5rem;">
             <div class="main-card p-4 my-4 shadow-lg rounded-4" style="max-width: 480px; margin-top: 6vh; background: rgba(255,255,255,0.95);">
                 @RenderBody()
             </div>
@@ -56,24 +56,32 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-    $(function () {
-        $('#notificationDropdown').on('hidden.bs.dropdown', function () {
-            var token = $('input[name="__RequestVerificationToken"]').val();
-            $.ajax({
-                url: '@Url.Action("MarkAllAsRead", "Notifications")',
-                type: 'POST',
-                data: {
-                    __RequestVerificationToken: token
-                },
-                success: function () {
-                    $('#notificationBadge').remove();
-                    $('.dropdown-menu').html('<li class="dropdown-item text-muted text-center">No new notifications</li>');
-                },
-                error: function () {
-                    alert('Error marking notifications as read.');
-                }
-            });
+    // Global button loading and duplicate prevention
+    $(document).on('submit', 'form', function (e) {
+        var $form = $(this);
+        // Find all submit buttons in the form
+        var $btns = $form.find('button[type="submit"], input[type="submit"]');
+        $btns.each(function () {
+            var $btn = $(this);
+            if (!$btn.data('loading-text')) {
+                $btn.data('loading-text', $btn.html() || $btn.val());
+            }
+            $btn.prop('disabled', true);
+            if ($btn.is('button')) {
+                $btn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading...');
+            } else if ($btn.is('input')) {
+                $btn.val('Loading...');
+            }
         });
+    });
+    // For non-form buttons (e.g., AJAX or custom actions), add a class 'btn-loading' to use this effect
+    $(document).on('click', 'button.btn-loading', function () {
+        var $btn = $(this);
+        if (!$btn.data('loading-text')) {
+            $btn.data('loading-text', $btn.html());
+        }
+        $btn.prop('disabled', true);
+        $btn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading...');
     });
     </script>
     @RenderSection("scripts", required: false)
