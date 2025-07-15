@@ -56,6 +56,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+
+
     // Global button loading and duplicate prevention
     $(document).on('submit', 'form', function (e) {
         var $form = $(this);
@@ -82,6 +84,37 @@
         }
         $btn.prop('disabled', true);
         $btn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading...');
+    });
+    </script>
+    <script>
+    // Notification bell: mark all as read when dropdown opens
+    $(document).ready(function () {
+        var notificationsMarked = false;
+        var $dropdown = $('#notificationDropdown');
+        var $badge = $('#notificationBadge');
+        var $notificationItems = $('.notification-item');
+        var $newBadges = $('.notification-item .badge');
+        
+        $dropdown.on('show.bs.dropdown', function () {
+            console.log('Dropdown opened');
+            if (notificationsMarked || $badge.length === 0) return;
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            console.log('Sending AJAX to mark all as read...');
+            $.ajax({
+                url: '/Notifications/MarkAllAsRead',
+                type: 'POST',
+                data: { __RequestVerificationToken: token },
+                success: function () {
+                    notificationsMarked = true;
+                    $badge.remove();
+                    $newBadges.remove();
+                    console.log('Notifications marked as read, badge and labels removed.');
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to mark notifications as read:', error, xhr.responseText);
+                }
+            });
+        });
     });
     </script>
     @RenderSection("scripts", required: false)

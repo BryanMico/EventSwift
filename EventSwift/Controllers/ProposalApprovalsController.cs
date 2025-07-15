@@ -120,6 +120,11 @@ namespace EventSwift.Controllers
             {
                 ModelState.AddModelError("", "User not found.");
                 ViewBag.CurrentUser = null;
+                // Return JSON error for AJAX
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "User not found." });
+                }
                 return View(approval);
             }
 
@@ -130,6 +135,10 @@ namespace EventSwift.Controllers
                 {
                     ModelState.AddModelError("approvalPassword", "Incorrect password.");
                     ViewBag.CurrentUser = currentUser;
+                    if (Request.IsAjaxRequest())
+                    {
+                        return Json(new { success = false, message = "Incorrect password." });
+                    }
                     return View(approval);
                 }
                 // Validate signature
@@ -137,6 +146,10 @@ namespace EventSwift.Controllers
                 {
                     ModelState.AddModelError("signatureData", "Signature is required.");
                     ViewBag.CurrentUser = currentUser;
+                    if (Request.IsAjaxRequest())
+                    {
+                        return Json(new { success = false, message = "Signature is required." });
+                    }
                     return View(approval);
                 }
                 // Save signature image to temp file
@@ -226,6 +239,10 @@ namespace EventSwift.Controllers
                 {
                     ModelState.AddModelError("feedbackMessage", "Feedback message is required when rejecting.");
                     ViewBag.CurrentUser = currentUser;
+                    if (Request.IsAjaxRequest())
+                    {
+                        return Json(new { success = false, message = "Feedback message is required when rejecting." });
+                    }
                     return View(approval);
                 }
 
@@ -257,11 +274,25 @@ namespace EventSwift.Controllers
             {
                 ModelState.AddModelError("", "Invalid action.");
                 ViewBag.CurrentUser = currentUser;
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { success = false, message = "Invalid action." });
+                }
                 return View(approval);
             }
 
             db.SaveChanges();
 
+            // If AJAX, return JSON for toast, else fallback to redirect
+            if (Request.IsAjaxRequest())
+            {
+                string msg = action == "Approve"
+                    ? "Proposal approved successfully."
+                    : action == "Reject"
+                        ? "Proposal returned with feedback."
+                        : "Action completed.";
+                return Json(new { success = true, message = msg });
+            }
             return RedirectToAction("ApprovalsIndex");
         }
 

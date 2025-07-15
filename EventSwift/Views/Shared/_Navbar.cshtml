@@ -73,3 +73,30 @@
 </nav>
 
 @Html.AntiForgeryToken()  <!-- Add this somewhere on your page to generate the token -->
+
+@section scripts {
+<script>
+$(document).ready(function () {
+    var notificationsMarked = false;
+    var $dropdown = $('#notificationDropdown');
+    var $badge = $('#notificationBadge');
+    var $notificationItems = $('.notification-item');
+    var $newBadges = $('.notification-item .badge');
+    
+    $dropdown.on('show.bs.dropdown', function () {
+        if (notificationsMarked || $badge.length === 0) return;
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        $.ajax({
+            url: '/Notifications/MarkAllAsRead',
+            type: 'POST',
+            headers: { 'RequestVerificationToken': token },
+            success: function () {
+                notificationsMarked = true;
+                $badge.remove();
+                $newBadges.remove();
+            }
+        });
+    });
+});
+</script>
+}

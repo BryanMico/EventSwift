@@ -159,19 +159,8 @@
                                 <input type="hidden" name="signatureData" id="signatureData" />
                                 <input type="hidden" name="approvalPassword" id="approvalPasswordHidden" />
                                 <input type="hidden" name="action" id="actionHidden" value="Approve" />
-
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" value="" id="rejectToggle" />
-                                    <label class="form-check-label" for="rejectToggle">
-                                        I want to return this document and provide feedback
-                                    </label>
-                                </div>
-
-                                <div class="mb-3" id="feedbackContainer" style="display:none;">
-                                    <label for="feedbackMessage" class="form-label">Feedback for return:</label>
-                                    <textarea class="form-control" id="feedbackMessage" name="feedbackMessage" rows="4"></textarea>
-                                    @Html.ValidationMessage("feedbackMessage", "", new { @class = "text-danger" })
-                                </div>
+                                <!-- Remove feedback textarea from main form, add hidden field for feedback -->
+                                <input type="hidden" id="feedbackMessage" name="feedbackMessage" />
 
                                 <button type="button" id="approveBtn" class="btn btn-success me-2">
                                     <i class="bi bi-check-circle me-1"></i>Approve
@@ -258,12 +247,44 @@
   </div>
 </div>
 
+<!-- Return Modal for Password and Feedback -->
+<div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="returnModalLabel">Confirm Return</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="returnFeedbackInput" class="form-label">Feedback for return:</label>
+          <textarea class="form-control" id="returnFeedbackInput" rows="4" required></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="returnPasswordInput" class="form-label">Enter your password:</label>
+          <input type="password" class="form-control" id="returnPasswordInput" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="confirmReturnBtn">Confirm Return</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast for success messages -->
+<div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080; min-width: 300px;">
+    <div id="actionToast" class="toast align-items-center text-bg-success border-0" role="alert" style="display:none;">
+        <div class="d-flex">
+            <div class="toast-body" id="actionToastBody"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
     <script>
-        const rejectToggle = document.getElementById('rejectToggle');
-        const feedbackContainer = document.getElementById('feedbackContainer');
-        const feedbackMessage = document.getElementById('feedbackMessage');
         const rejectBtn = document.getElementById('rejectBtn');
         const approveBtn = document.getElementById('approveBtn');
         const selectedEventDate = document.getElementById('selectedEventDate');
@@ -273,35 +294,39 @@
         const modalEventVenue = document.getElementById('modalEventVenue');
         const isVPAOffice = @(Model.Office == "VPA" && Model.EventProposal.TargetOfficeRole == "VPA" ? "true" : "false");
 
-        if (rejectToggle) {
-            rejectToggle.addEventListener('change', function () {
-                if (this.checked) {
-                    feedbackContainer.style.display = 'block';
-                } else {
-                    feedbackContainer.style.display = 'none';
-                    feedbackMessage.value = '';
-                }
-            });
-        }
+        // Update Return button logic
         if (rejectBtn) {
             rejectBtn.addEventListener('click', function (e) {
-                if (!rejectToggle.checked) {
-                    e.preventDefault();
-                    alert('Please check "I want to return" to provide feedback.');
-                    return;
-                }
-                if (feedbackMessage.value.trim() === '') {
-                    e.preventDefault();
-                    alert('Please provide feedback when returning.');
-                    feedbackMessage.focus();
-                    return;
-                }
-                
-                // Set the action to Return and submit the form
-                document.getElementById('actionHidden').value = 'Reject';
-                document.getElementById('approvalForm').submit();
+                e.preventDefault();
+                // Show return modal for password and feedback
+                document.getElementById('returnFeedbackInput').value = '';
+                document.getElementById('returnPasswordInput').value = '';
+                const returnModal = new bootstrap.Modal(document.getElementById('returnModal'));
+                returnModal.show();
             });
         }
+
+        function showToast(message, isError) {
+            var toast = document.getElementById('actionToast');
+            var toastBody = document.getElementById('actionToastBody');
+            toastBody.textContent = message;
+            toast.classList.remove('text-bg-success', 'text-bg-danger');
+            toast.classList.add(isError ? 'text-bg-danger' : 'text-bg-success');
+            toast.style.display = 'block';
+            var bsToast = bootstrap.Toast.getOrCreateInstance(toast, { delay: 4000 });
+            bsToast.show();
+        }
+
+        // Show toast after page reload if message exists in localStorage
+        document.addEventListener('DOMContentLoaded', function () {
+            var msg = localStorage.getItem('actionToastMessage');
+            var isError = localStorage.getItem('actionToastIsError') === 'true';
+            if (msg) {
+                showToast(msg, isError);
+                localStorage.removeItem('actionToastMessage');
+                localStorage.removeItem('actionToastIsError');
+            }
+        });
 
         // Handle approve button click
         if (approveBtn) {
@@ -350,7 +375,7 @@
             }
         });
 
-        // Approval Modal logic
+        // Approval Modal logic (AJAX submit)
         document.getElementById('confirmApprovalBtn').addEventListener('click', function () {
             const passwordInput = document.getElementById('approvalPasswordInput');
             if (!passwordInput.value) {
@@ -366,8 +391,77 @@
             document.getElementById('approvalPasswordHidden').value = passwordInput.value;
             document.getElementById('signatureData').value = signaturePad.toDataURL();
             document.getElementById('actionHidden').value = 'Approve'; // Always set action to Approve
-            // Submit the form
-            document.getElementById('approvalForm').submit();
+            // Submit the form via AJAX
+            var $form = $('#approvalForm');
+            var formData = new FormData($form[0]);
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                success: function (resp) {
+                    if (resp && resp.success) {
+                        localStorage.setItem('actionToastMessage', resp.message);
+                        localStorage.setItem('actionToastIsError', 'false');
+                        location.reload();
+                    } else {
+                        showToast('An error occurred.', true);
+                    }
+                },
+                error: function (xhr) {
+                    // Only show error toast if not about to reload for a success
+                    if (!localStorage.getItem('actionToastMessage')) {
+                        var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred.';
+                        showToast(msg, true);
+                    }
+                }
+            });
+        });
+
+        // Handle confirm return in modal (AJAX submit)
+        document.getElementById('confirmReturnBtn').addEventListener('click', function () {
+            const feedbackInput = document.getElementById('returnFeedbackInput');
+            const passwordInput = document.getElementById('returnPasswordInput');
+            if (!feedbackInput.value.trim()) {
+                alert('Please provide feedback.');
+                feedbackInput.focus();
+                return;
+            }
+            if (!passwordInput.value) {
+                alert('Please enter your password.');
+                passwordInput.focus();
+                return;
+            }
+            // Set hidden fields in the form
+            document.getElementById('feedbackMessage').value = feedbackInput.value;
+            document.getElementById('approvalPasswordHidden').value = passwordInput.value;
+            document.getElementById('actionHidden').value = 'Reject';
+            // Submit the form via AJAX
+            var $form = $('#approvalForm');
+            var formData = new FormData($form[0]);
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                success: function (resp) {
+                    if (resp && resp.success) {
+                        localStorage.setItem('actionToastMessage', resp.message);
+                        localStorage.setItem('actionToastIsError', 'false');
+                        location.reload();
+                    } else {
+                        showToast('An error occurred.', true);
+                    }
+                },
+                error: function (xhr) {
+                    var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred.';
+                    showToast(msg, true);
+                }
+            });
         });
 
 
