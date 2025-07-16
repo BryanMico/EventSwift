@@ -20,7 +20,12 @@
 
             <div class="mb-3">
                 <label for="TargetOfficeRole">Send To</label>
-                @Html.DropDownList("TargetOfficeRole", new SelectList(new[] { "VPAA", "VPF", "AMU", "VPA" }), "Select Office", new { @class = "form-control", required = "required" })
+                @Html.DropDownList("TargetOfficeRole", new SelectList(new[] {
+    new { Value = "VPAA", Text = "VP Academic Affairs (VPAA)" },
+    new { Value = "VPF", Text = "VP Finance (VPF)" },
+    new { Value = "AMU", Text = "Asset Management Unit (AMU)" },
+    new { Value = "VPA", Text = "VP Administration (VPA)" }
+}, "Value", "Text"), "Select Office", new { @class = "form-control", required = "required" })
                 <small class="form-text text-muted">Documents sent to VPAA/VPF/AMU will be automatically forwarded to VPA after approval. VPA documents go directly to VPA.</small>
             </div>
 

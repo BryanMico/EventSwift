@@ -215,7 +215,22 @@ namespace EventSwift.Controllers
                     string pdfPath = Server.MapPath(filePath);
                     if (System.IO.File.Exists(pdfPath))
                     {
-                        StampPdfWithSignature(pdfPath, tempSignaturePath, approval.Office);
+                        int stackIndex = 0;
+                        if (approval.Office == "VPA")
+                        {
+                            // Check if there is already an approved stamp from VPF, VPAA, or AMU
+                            var previousApproval = db.ProposalApprovals
+                                .Where(a => a.EventProposalId == approval.EventProposalId &&
+                                            (a.Office == "VPF" || a.Office == "VPAA" || a.Office == "AMU") &&
+                                            a.Status == "Approved")
+                                .OrderByDescending(a => a.ActionDate)
+                                .FirstOrDefault();
+                            if (previousApproval != null)
+                            {
+                                stackIndex = 1; // Place VPA above previous
+                            }
+                        }
+                        StampPdfWithSignature(pdfPath, tempSignaturePath, approval.Office, stackIndex);
                     }
                 }
                 // Delete temp signature file
@@ -297,7 +312,7 @@ namespace EventSwift.Controllers
         }
 
         // Helper method to stamp signature image and text on PDF
-        private void StampPdfWithSignature(string pdfPath, string signatureImagePath, string office)
+        private void StampPdfWithSignature(string pdfPath, string signatureImagePath, string office, int stackIndex = 0)
         {
             string tempPath = pdfPath + ".tmp";
             using (var reader = new PdfReader(pdfPath))
@@ -315,52 +330,30 @@ namespace EventSwift.Controllers
                 float pageWidth = pageSize.Width;
                 float pageHeight = pageSize.Height;
 
-                // Calculate position based on office (different positions for different offices)
-                float xPos, yPos;
-                BaseColor textColor;
-                
-                switch (office.ToUpper())
-                {
-                    case "VPAA":
-                        xPos = 50;
-                        yPos = pageHeight - 100;
-                        textColor = BaseColor.BLUE;
-                        break;
-                    case "VPF":
-                        xPos = pageWidth - 250;
-                        yPos = pageHeight - 100;
-                        textColor = BaseColor.GREEN;
-                        break;
-                    case "AMU":
-                        xPos = 50;
-                        yPos = 150;
-                        textColor = BaseColor.ORANGE;
-                        break;
-                    case "VPA":
-                        xPos = pageWidth - 250;
-                        yPos = 150;
-                        textColor = BaseColor.RED;
-                        break;
-                    default:
-                        xPos = 50;
-                        yPos = 50;
-                        textColor = BaseColor.BLACK;
-                        break;
-                }
+                // Always bottom right for all offices, but stack if needed
+                float marginRight = 50f;
+                float marginBottom = 50f;
+                float stampHeight = 50f;
+                float xPos = pageWidth - marginRight - 120f; // 120 is the width of the stamp
+                float yPos = marginBottom + (stackIndex * (stampHeight + 10f)); // 10f is spacing between stamps
 
                 // Draw the approval text
+                BaseColor textColor = BaseColor.BLACK;
+                switch (office.ToUpper())
+                {
+                    case "VPAA": textColor = BaseColor.BLUE; break;
+                    case "VPF": textColor = BaseColor.GREEN; break;
+                    case "AMU": textColor = BaseColor.ORANGE; break;
+                    case "VPA": textColor = BaseColor.RED; break;
+                }
                 BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                 over.BeginText();
                 over.SetFontAndSize(bf, 12);
                 over.SetColorFill(textColor);
-                
-                // Add approval text with date
                 string approvalText = $"APPROVED BY {office}";
-                over.ShowTextAligned(Element.ALIGN_LEFT, approvalText, xPos, yPos + 60, 0);
-                
+                over.ShowTextAligned(Element.ALIGN_LEFT, approvalText, xPos, yPos + stampHeight + 10, 0);
                 string dateText = DateTime.Now.ToString("MMM dd, yyyy");
-                over.ShowTextAligned(Element.ALIGN_LEFT, dateText, xPos, yPos + 45, 0);
-                
+                over.ShowTextAligned(Element.ALIGN_LEFT, dateText, xPos, yPos + stampHeight - 5, 0);
                 over.EndText();
 
                 // Draw the signature image

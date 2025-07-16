@@ -19,6 +19,19 @@
     </div>
 }
 
+@functions {
+    public string GetOfficeDisplay(string office) {
+        switch (office) {
+            case "VPAA": return "VP Academic Affairs (VPAA)";
+            case "VPF": return "VP Finance (VPF)";
+            case "VPA": return "VP Administration (VPA)";
+            case "AMU": return "Asset Management Unit (AMU)";
+            case "President": return "President";
+            default: return office;
+        }
+    }
+}
+
 <div class="d-flex flex-column min-vh-100">
     @Html.Partial("~/Views/Shared/_Navbar.cshtml")
     <div class="container py-4 flex-grow-1">
@@ -113,7 +126,7 @@
                                             </span>
                                         </td>
                                         <td>@proposal.SubmittedAt.ToString("g")</td>
-                                        <td>@proposal.TargetOfficeRole</td>
+                                        <td>@GetOfficeDisplay(proposal.TargetOfficeRole)</td>
                                         <td>
                                             <a href="@Url.Content(proposal.FilePath)" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-arrow-down"></i> View File</a>
                                         </td>

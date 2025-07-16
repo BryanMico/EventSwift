@@ -36,7 +36,15 @@
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.Role, new { @class = "form-label" })
-                @Html.DropDownListFor(model => model.Role, new SelectList(new[] { "SuperAdmin", "Client", "VPAA", "VPF", "AMU", "President" }, Model.Role), "Select Role", new { @class = "form-select" })
+                @Html.DropDownListFor(model => model.Role, new SelectList(new[] {
+    new { Value = "SuperAdmin", Text = "SuperAdmin" },
+    new { Value = "Client", Text = "Client" },
+    new { Value = "VPAA", Text = "VP Academic Affairs (VPAA)" },
+    new { Value = "VPF", Text = "VP Finance (VPF)" },
+    new { Value = "VPA", Text = "VP Administration (VPA)" },
+    new { Value = "AMU", Text = "Asset Management Unit (AMU)" },
+    new { Value = "President", Text = "President" }
+}, "Value", "Text", Model.Role), "Select Role", new { @class = "form-select" })
             </div>
 
             <button type="submit" class="btn btn-primary">Save Changes</button>

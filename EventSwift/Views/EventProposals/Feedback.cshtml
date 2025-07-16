@@ -1,6 +1,6 @@
 ﻿@model EventSwift.Models.EventProposal
 @{
-    ViewBag.Title = "Respond to Feedback";
+    ViewBag.Title = "Respond to Remarks";
     ViewBag.SkipNavbar = true;
 }
 
@@ -10,9 +10,9 @@
     <div class="flex-grow-1 p-2">
         @Html.Partial("~/Views/Shared/_Navbar.cshtml")
 
-        <h2 class="mb-4" style="color: var(--green);">Respond to Feedback</h2>
+        <h2 class="mb-4" style="color: var(--green);">Respond to Remarks</h2>
 
-        <h5>Latest Feedback:</h5>
+        <h5>Latest Remarks:</h5>
         @if (Model.Feedbacks.Any())
         {
             <ul class="list-group mb-3">
@@ -24,7 +24,7 @@
         }
         else
         {
-            <p>No feedback yet.</p>
+            <p>No remarks yet.</p>
         }
 
         @using (Html.BeginForm())
@@ -32,7 +32,7 @@
             @Html.AntiForgeryToken()
 
             <div class="mb-3">
-                <label for="feedback">Your Response</label>
+                <label for="feedback">Your Remarks</label>
                 <textarea name="feedback" class="form-control" required></textarea>
             </div>
 

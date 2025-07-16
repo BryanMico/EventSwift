@@ -5,6 +5,19 @@
     ViewBag.SkipNavbar = true;
 }
 
+@functions {
+    public string GetOfficeDisplay(string office) {
+        switch (office) {
+            case "VPAA": return "VP Academic Affairs (VPAA)";
+            case "VPF": return "VP Finance (VPF)";
+            case "VPA": return "VP Administration (VPA)";
+            case "AMU": return "Asset Management Unit (AMU)";
+            case "President": return "President";
+            default: return office;
+        }
+    }
+}
+
 <div class="d-flex">
     @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
 
@@ -27,7 +40,7 @@
                             <div class="col-md-6">
                                 <h6 class="text-muted mb-2">Document Information</h6>
                                 <p><strong>Title:</strong> @Model.Title</p>
-                                <p><strong>Target Office:</strong> @Model.TargetOfficeRole</p>
+                                <p><strong>Target Office:</strong> @GetOfficeDisplay(Model.TargetOfficeRole)</p>
                                 <p><strong>Original Submission:</strong> @Model.SubmittedAt.ToString("g")</p>
                             </div>
                             <div class="col-md-6">
@@ -42,13 +55,13 @@
                         {
                             <div class="alert alert-warning mb-4">
                                 <h6 class="mb-3" style="color: var(--green);">
-                                    <i class="bi bi-chat-dots me-2"></i>Feedback from Offices
+                                    <i class="bi bi-chat-dots me-2"></i>Remarks from Offices
                                 </h6>
                                 @foreach (var fb in Model.Feedbacks)
                                 {
                                     <div class="mb-3">
-                                        <strong>@fb.Office Office:</strong>
-                                        <p class="mb-1">@fb.Feedback</p>
+                                        <strong>@GetOfficeDisplay(fb.Office) Office:</strong>
+                                        <p class="mb-1">@fb.Remarks</p>
                                         <small class="text-muted">
                                             <i class="bi bi-clock me-1"></i>@fb.FeedbackDate.ToString("g")
                                         </small>
@@ -76,7 +89,7 @@
                                     <span id="file-name" class="ms-2 text-muted small d-block mt-2"></span>
                                 </div>
                                 <small class="form-text text-muted">
-                                    <i class="bi bi-info-circle me-1"></i>Please upload a PDF file with the corrections based on the feedback provided above.
+                                    <i class="bi bi-info-circle me-1"></i>Please upload a PDF file with the corrections based on the remarks provided above.
                                 </small>
                             </div>
 
@@ -101,7 +114,7 @@
                         <ul class="list-unstyled">
                             <li class="mb-2">
                                 <i class="bi bi-check-circle text-success me-2"></i>
-                                Review all feedback carefully
+                                Review all remarks carefully
                             </li>
                             <li class="mb-2">
                                 <i class="bi bi-check-circle text-success me-2"></i>

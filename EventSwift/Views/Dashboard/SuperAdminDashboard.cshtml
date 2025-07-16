@@ -16,6 +16,12 @@
         <div class="row row-cols-6 g-2 mb-2">
             <!-- Cards -->
             <div class="col">
+                <div class="card text-white bg-info p-2 text-center">
+                    <h6>Total Documents</h6>
+                    <p class="fs-4 mb-0">@Model.TotalProposals</p>
+                </div>
+            </div>
+            <div class="col">
                 <div class="card text-white bg-success p-2 text-center">
                     <h6>Total Users</h6>
                     <p class="fs-4 mb-0">@Model.TotalUsers</p>
@@ -23,13 +29,13 @@
             </div>
             <div class="col">
                 <div class="card text-white bg-warning p-2 text-center">
-                    <h6>Pending Proposals</h6>
+                    <h6>For Approval</h6>
                     <p class="fs-4 mb-0">@Model.PendingProposals</p>
                 </div>
             </div>
             <div class="col">
                 <div class="card text-white bg-primary p-2 text-center">
-                    <h6>Approved Proposals</h6>
+                    <h6>Approved Documents</h6>
                     <p class="fs-4 mb-0">@Model.ApprovedProposals</p>
                 </div>
             </div>
@@ -40,7 +46,7 @@
                 </div>
             </div>
             <div class="col">
-                <div class="card text-white bg-info p-2 text-center">
+                <div class="card text-white bg-secondary p-2 text-center">
                     <h6>Avg Approval</h6>
                     <p class="fs-4 mb-0">@Model.AverageApprovalDays.ToString("0.0")<small> days</small></p>
                 </div>

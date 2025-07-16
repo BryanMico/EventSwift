@@ -26,44 +26,60 @@
 
         <!-- Statistics Cards -->
         <div class="row mb-4">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center justify-content-center mb-3">
                             <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; background: var(--green);">
-                                <i class="bi bi-clock-history text-white" style="font-size: 1.5rem;"></i>
+                                <i class="bi bi-calendar-event text-white" style="font-size: 1.5rem;"></i>
                             </div>
                             <div>
-                                <h3 class="mb-0 fw-bold" style="color: var(--green);">@ViewBag.PendingProposals</h3>
-                                <small class="text-muted">Pending</small>
+                                <h3 class="mb-0 fw-bold" style="color: var(--green);">@(recentProposals != null ? recentProposals.Count : 0)</h3>
+                                <small class="text-muted">Total Events</small>
                             </div>
                         </div>
-                        <h6 class="card-title mb-0" style="color: var(--green);">Pending Proposals</h6>
+                        <h6 class="card-title mb-0" style="color: var(--green);">Total Events</h6>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center justify-content-center mb-3">
                             <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; background: var(--orange);">
-                                <i class="bi bi-check-circle text-white" style="font-size: 1.5rem;"></i>
+                                <i class="bi bi-clock-history text-white" style="font-size: 1.5rem;"></i>
                             </div>
                             <div>
-                                <h3 class="mb-0 fw-bold" style="color: var(--orange);">@ViewBag.ApprovedProposals</h3>
-                                <small class="text-muted">Approved</small>
+                                <h3 class="mb-0 fw-bold" style="color: var(--orange);">@ViewBag.PendingProposals</h3>
+                                <small class="text-muted">For Approval</small>
                             </div>
                         </div>
-                        <h6 class="card-title mb-0" style="color: var(--orange);">Approved Proposals</h6>
+                        <h6 class="card-title mb-0" style="color: var(--orange);">For Approval</h6>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex align-items-center justify-content-center mb-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; background: var(--success);">
+                                <i class="bi bi-check-circle text-white" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0 fw-bold" style="color: var(--success);">@ViewBag.ApprovedProposals</h3>
+                                <small class="text-muted">Approved</small>
+                            </div>
+                        </div>
+                        <h6 class="card-title mb-0" style="color: var(--success);">Approved Documents</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body text-center">
                         <div class="d-flex align-items-center justify-content-center mb-3">
                             <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; background: var(--brown);">
-                                <i class="bi bi-x-circle text-white" style="font-size: 1.5rem;"></i>
+                                <i class="bi bi-arrow-left-circle text-white" style="font-size: 1.5rem;"></i>
                             </div>
                             <div>
                                 <h3 class="mb-0 fw-bold" style="color: var(--brown);">@ViewBag.RejectedProposals</h3>

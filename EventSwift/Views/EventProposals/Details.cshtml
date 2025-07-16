@@ -34,6 +34,19 @@
     bool isVPA = currentUserRole == "VPA";
 }
 
+@functions {
+    public string GetOfficeDisplay(string office) {
+        switch (office) {
+            case "VPAA": return "VP Academic Affairs (VPAA)";
+            case "VPF": return "VP Finance (VPF)";
+            case "VPA": return "VP Administration (VPA)";
+            case "AMU": return "Asset Management Unit (AMU)";
+            case "President": return "President";
+            default: return office;
+        }
+    }
+}
+
 <div class="d-flex">
     @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
     <div class="flex-grow-1 p-2">
@@ -57,9 +70,7 @@
     <div class="d-flex justify-content-between align-items-center mb-2">
         <a href="@Url.Action("Index", "EventProposals")" class="btn btn-link" style="color: var(--green); text-decoration: none; font-weight: 500;"><i class="bi bi-arrow-left me-1"></i> Back to My Events</a>
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <button type="button" class="btn btn-custom d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#trackingModal">
-                <i class="bi bi-file-earmark-check me-2"></i>Document Tracking
-            </button>
+      
             @if (Model.Status == "SentToPresident")
             {
     <span class="badge bg-warning text-dark">Sent to President</span> }
@@ -111,35 +122,35 @@ else if (Model.Status == "ApprovedByPresident")
         <div>
             <h5 class="mb-2" style="color: var(--green); font-weight: 600;"><i class="bi bi-patch-check me-2"></i>Event Approval Status</h5>
             <div class="d-flex align-items-center gap-3 mb-2">
-                <span data-bs-toggle="tooltip" title="VPAA Approval">
+                <span data-bs-toggle="tooltip" title="@GetOfficeDisplay("VPAA") Approval">
                     <i class="bi bi-person-circle" style="color: @(allVPAAApproved ? "#28a745" : "#dc3545"); font-size: 1.5em;"></i>
-                    <span class="ms-1">VPAA</span>
+                    <span class="ms-1">@GetOfficeDisplay("VPAA")</span>
                     <i class="bi @(allVPAAApproved ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") ms-1"></i>
                 </span>
-                <span data-bs-toggle="tooltip" title="VPF Approval">
+                <span data-bs-toggle="tooltip" title="@GetOfficeDisplay("VPF") Approval">
                     <i class="bi bi-person-circle" style="color: @(allVPFApproved ? "#28a745" : "#dc3545"); font-size: 1.5em;"></i>
-                    <span class="ms-1">VPF</span>
+                    <span class="ms-1">@GetOfficeDisplay("VPF")</span>
                     <i class="bi @(allVPFApproved ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") ms-1"></i>
                 </span>
-                <span data-bs-toggle="tooltip" title="AMU Approval">
+                <span data-bs-toggle="tooltip" title="@GetOfficeDisplay("AMU") Approval">
                     <i class="bi bi-person-circle" style="color: @(allAMIApproved ? "#28a745" : "#dc3545"); font-size: 1.5em;"></i>
-                    <span class="ms-1">AMU</span>
+                    <span class="ms-1">@GetOfficeDisplay("AMU")</span>
                     <i class="bi @(allAMIApproved ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") ms-1"></i>
                 </span>
                 <span class="ms-2">
                     <i class="bi bi-arrow-right" style="color: var(--orange); font-size: 1.2em;"></i>
                 </span>
-                <span data-bs-toggle="tooltip" title="VPA Approval">
+                <span data-bs-toggle="tooltip" title="@GetOfficeDisplay("VPA") Approval">
                     <i class="bi bi-person-circle" style="color: @(allVPAApproved ? "#28a745" : "#dc3545"); font-size: 1.5em;"></i>
-                    <span class="ms-1">VPA</span>
+                    <span class="ms-1">@GetOfficeDisplay("VPA")</span>
                     <i class="bi @(allVPAApproved ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") ms-1"></i>
                 </span>
                 <span class="ms-2">
                     <i class="bi bi-arrow-right" style="color: var(--orange); font-size: 1.2em;"></i>
                 </span>
-                <span data-bs-toggle="tooltip" title="President Approval">
+                <span data-bs-toggle="tooltip" title="@GetOfficeDisplay("President") Approval">
                     <i class="bi bi-person-circle" style="color: @(Model.Status == "ApprovedByPresident" ? "#28a745" : "#dc3545"); font-size: 1.5em;"></i>
-                    <span class="ms-1">President</span>
+                    <span class="ms-1">@GetOfficeDisplay("President")</span>
                     <i class="bi @(Model.Status == "ApprovedByPresident" ? "bi-check-circle-fill text-success" : "bi-x-circle-fill text-danger") ms-1"></i>
                 </span>
             </div>
@@ -157,6 +168,9 @@ else if (Model.Status == "ApprovedByPresident")
     <div class="d-flex justify-content-between align-items-center mb-3">
         <button type="button" class="btn btn-custom d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createProposalModal">
             <i class="bi bi-plus-circle"></i> Submit Document
+        </button>
+        <button type="button" class="btn btn-custom d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#trackingModal">
+            <i class="bi bi-file-earmark-check me-2"></i>Document Tracking
         </button>
     </div> }
                 else
@@ -192,13 +206,13 @@ else if (Model.Status == "ApprovedByPresident")
         <td>
             @if (proposal.Status == "Approved")
             {
-    <span class="badge" style="background: var(--green); color: #fff;">VPA Approved</span> }
+    <span class="badge" style="background: var(--green); color: #fff;">@GetOfficeDisplay("VPA") Approved</span> }
                         else if (proposal.Status == "Reviewed")
                         {
-    <span class="badge" style="background: #17a2b8; color: #fff;">For Approval VPA</span> }
+    <span class="badge" style="background: #17a2b8; color: #fff;">For Approval @GetOfficeDisplay("VPA")</span> }
                         else if (proposal.Status == "Pending")
                         {
-    <span class="badge" style="background: var(--orange); color: #fff;">For Approval @proposal.TargetOfficeRole</span> }
+    <span class="badge" style="background: var(--orange); color: #fff;">For Approval @GetOfficeDisplay(proposal.TargetOfficeRole)</span> }
                         else if (proposal.Status == "Rejected")
                         {
     <span class="badge" style="background: var(--brown); color: #fff;">Returned</span> }
@@ -207,7 +221,7 @@ else if (Model.Status == "ApprovedByPresident")
     <span class="badge bg-secondary">@proposal.Status</span>}
         </td>
         <td>@proposal.SubmittedAt.ToString("g")</td>
-        <td>@proposal.TargetOfficeRole</td>
+        <td>@GetOfficeDisplay(proposal.TargetOfficeRole)</td>
         <td>
             <div class="d-flex align-items-center gap-2">
                 @if (proposal.Status == "Rejected")
@@ -291,12 +305,12 @@ else if (Model.Status == "ApprovedByPresident")
 
                                             trackingSteps.Add(new
                                             {
-                                                Step = "VPAA Review",
+                                                Step = GetOfficeDisplay("VPAA") + " Review",
                                                 Status = vpaaRejected ? "rejected" : (vpaaReviewed ? "completed" : "in-progress"),
                                                 Icon = "bi-person-check",
-                                                Description = vpaaRejected ? $"Returned by VPAA - {vpaaDocCount} document{(vpaaDocCount > 1 ? "s" : "")} need revision" :
-                                                               (vpaaReviewed ? $"Approved by VPAA - {vpaaDocCount} document{(vpaaDocCount > 1 ? "s" : "")} ready for VPA" :
-                                                               $"For Approval VPAA - {vpaaDocCount} document{(vpaaDocCount > 1 ? "s" : "")}: {vpaaDocList}"),
+                                                Description = vpaaRejected ? $"Returned by {GetOfficeDisplay("VPAA")} - {vpaaDocCount} document{(vpaaDocCount > 1 ? "s" : "")} need revision" :
+                                                               (vpaaReviewed ? $"Approved by {GetOfficeDisplay("VPAA")} - {vpaaDocCount} document{(vpaaDocCount > 1 ? "s" : "")} ready for VPA" :
+                                                               $"For Approval {GetOfficeDisplay("VPAA")} - {vpaaDocCount} document{(vpaaDocCount > 1 ? "s" : "")}: {vpaaDocList}"),
                                                 Time = (DateTime?)null,
                                                 Color = vpaaRejected ? "danger" : (vpaaReviewed ? "success" : "warning")
                                             });
@@ -337,12 +351,12 @@ else if (Model.Status == "ApprovedByPresident")
 
                                             trackingSteps.Add(new
                                             {
-                                                Step = "VPF Review",
+                                                Step = GetOfficeDisplay("VPF") + " Review",
                                                 Status = vpfRejected ? "rejected" : (vpfReviewed ? "completed" : "in-progress"),
                                                 Icon = "bi-person-check",
-                                                Description = vpfRejected ? $"Returned by VPF - {vpfDocCount} document{(vpfDocCount > 1 ? "s" : "")} need revision" :
-                                                               (vpfReviewed ? $"Approved by VPF - {vpfDocCount} document{(vpfDocCount > 1 ? "s" : "")} ready for VPA" :
-                                                               $"For Approval VPF - {vpfDocCount} document{(vpfDocCount > 1 ? "s" : "")}: {vpfDocList}"),
+                                                Description = vpfRejected ? $"Returned by {GetOfficeDisplay("VPF")} - {vpfDocCount} document{(vpfDocCount > 1 ? "s" : "")} need revision" :
+                                                               (vpfReviewed ? $"Approved by {GetOfficeDisplay("VPF")} - {vpfDocCount} document{(vpfDocCount > 1 ? "s" : "")} ready for VPA" :
+                                                               $"For Approval {GetOfficeDisplay("VPF")} - {vpfDocCount} document{(vpfDocCount > 1 ? "s" : "")}: {vpfDocList}"),
                                                 Time = (DateTime?)null,
                                                 Color = vpfRejected ? "danger" : (vpfReviewed ? "success" : "warning")
                                             });
@@ -383,12 +397,12 @@ else if (Model.Status == "ApprovedByPresident")
 
                                             trackingSteps.Add(new
                                             {
-                                                Step = "AMU Review",
+                                                Step = GetOfficeDisplay("AMU") + " Review",
                                                 Status = amuRejected ? "rejected" : (amuReviewed ? "completed" : "in-progress"),
                                                 Icon = "bi-person-check",
-                                                Description = amuRejected ? $"Returned by AMU - {amuDocCount} document{(amuDocCount > 1 ? "s" : "")} need revision" :
-                                                               (amuReviewed ? $"Approved by AMU - {amuDocCount} document{(amuDocCount > 1 ? "s" : "")} ready for VPA" :
-                                                               $"For Approval AMU - {amuDocCount} document{(amuDocCount > 1 ? "s" : "")}: {amuDocList}"),
+                                                Description = amuRejected ? $"Returned by {GetOfficeDisplay("AMU")} - {amuDocCount} document{(amuDocCount > 1 ? "s" : "")} need revision" :
+                                                               (amuReviewed ? $"Approved by {GetOfficeDisplay("AMU")} - {amuDocCount} document{(amuDocCount > 1 ? "s" : "")} ready for VPA" :
+                                                               $"For Approval {GetOfficeDisplay("AMU")} - {amuDocCount} document{(amuDocCount > 1 ? "s" : "")}: {amuDocList}"),
                                                 Time = (DateTime?)null,
                                                 Color = amuRejected ? "danger" : (amuReviewed ? "success" : "warning")
                                             });
@@ -455,7 +469,7 @@ else if (Model.Status == "ApprovedByPresident")
 
                                         trackingSteps.Add(new
                                         {
-                                            Step = "VPA Review",
+                                            Step = GetOfficeDisplay("VPA") + " Review",
                                             Status = vpaRejected ? "rejected" : (vpaApproved ? "completed" : "in-progress"),
                                             Icon = "bi-building-check",
                                             Description = vpaDescription,
@@ -483,7 +497,7 @@ else if (Model.Status == "ApprovedByPresident")
 
                                         trackingSteps.Add(new
                                         {
-                                            Step = "President Approval",
+                                            Step = GetOfficeDisplay("President") + " Approval",
                                             Status = presidentApproved ? "completed" : (sentToPresident ? "in-progress" : "pending"),
                                             Icon = "bi-award",
                                             Description = presidentDescription,
@@ -574,8 +588,13 @@ else if (Model.Status == "ApprovedByPresident")
 
                                             <div class="mb-3">
                                                 <label for="TargetOfficeRole" class="form-label">Send To</label>
-                                                @Html.DropDownList("targetOffice", new SelectList(new[] { "VPAA", "VPF", "AMU", "VPA" }), "Select Office", new { @class = "form-control", required = "required" })
-                                                <small class="form-text text-muted">Documents sent to VPAA/VPF/AMU will be automatically forwarded to VPA after approval. VPA documents go directly to VPA.</small>
+                                                @Html.DropDownList("targetOffice", new SelectList(new[] {
+                                                    new { Value = "VPAA", Text = "VP Academic Affairs (VPAA)" },
+                                                    new { Value = "VPF", Text = "VP Finance (VPF)" },
+                                                    new { Value = "AMU", Text = "Asset Management Unit (AMU)" },
+                                                    new { Value = "VPA", Text = "VP Administration (VPA)" }
+                                                }, "Value", "Text"), "Select Office", new { @class = "form-control", required = "required" })
+                                                <small class="form-text text-muted">Documents sent to VP Academic Affairs (VPAA)/VP Finance (VPF)/Asset Management Unit (AMU) will be automatically forwarded to VP Administration (VPA) after approval. VP Administration (VPA) documents go directly to VP Administration (VPA).</small>
                                             </div>
 
                                             <div class="mb-3">

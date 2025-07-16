@@ -121,7 +121,7 @@
                     <div class="card shadow-sm border-0 mb-4">
                         <div class="card-header" style="background: var(--light-yellow); border-bottom: 2px solid var(--orange);">
                             <h5 class="mb-0" style="color: var(--green); font-weight: 600;">
-                                <i class="bi bi-check2-square me-2"></i>Approve/Return
+                                <i class="bi bi-check2-square me-2"></i>View Document Details
                             </h5>
                         </div>
                         <div class="card-body">
@@ -247,7 +247,7 @@
   </div>
 </div>
 
-<!-- Return Modal for Password and Feedback -->
+<!-- Return Modal for Password and Remarks -->
 <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-md modal-dialog-centered">
     <div class="modal-content">
@@ -257,7 +257,7 @@
       </div>
       <div class="modal-body">
         <div class="mb-3">
-          <label for="returnFeedbackInput" class="form-label">Feedback for return:</label>
+          <label for="returnFeedbackInput" class="form-label">Remarks for return:</label>
           <textarea class="form-control" id="returnFeedbackInput" rows="4" required></textarea>
         </div>
         <div class="mb-3">
@@ -425,7 +425,7 @@
             const feedbackInput = document.getElementById('returnFeedbackInput');
             const passwordInput = document.getElementById('returnPasswordInput');
             if (!feedbackInput.value.trim()) {
-                alert('Please provide feedback.');
+                alert('Please provide remarks.');
                 feedbackInput.focus();
                 return;
             }

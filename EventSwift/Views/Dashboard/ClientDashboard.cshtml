@@ -181,7 +181,18 @@
         </div>
 
         <div class="row">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
+                <div class="card text-white d-flex flex-row align-items-center" style="background-color: var(--green);">
+                    <div class="p-3">
+                        <i class="bi bi-calendar-event display-6"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">Total Events</h5>
+                        <p class="card-text fs-3 mb-0">@Model.Events.Count</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
                 <div class="card text-white d-flex flex-row align-items-center" style="background-color: var(--green);">
                     <div class="p-3">
                         <i class="bi bi-file-earmark-text display-6"></i>
@@ -192,21 +203,21 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card text-white d-flex flex-row align-items-center" style="background-color: var(--orange);">
                     <div class="p-3">
                         <i class="bi bi-hourglass-split display-6"></i>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title mb-1">Pending Approvals</h5>
+                        <h5 class="card-title mb-1">For Approval</h5>
                         <p class="card-text fs-3 mb-0">@Model.PendingApprovalsCount</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card text-white d-flex flex-row align-items-center" style="background-color: var(--brown);">
                     <div class="p-3">
-                        <i class="bi bi-x-circle display-6"></i>
+                        <i class="bi bi-arrow-left-circle display-6"></i>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title mb-1">Returned Documents</h5>

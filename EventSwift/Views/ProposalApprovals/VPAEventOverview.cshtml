@@ -35,6 +35,19 @@
                               (allDirectVpaApproved || !directVpaProposals.Any());
 }
 
+@functions {
+    public string GetOfficeDisplay(string office) {
+        switch (office) {
+            case "VPAA": return "VP Academic Affairs (VPAA)";
+            case "VPF": return "VP Finance (VPF)";
+            case "VPA": return "VP Administration (VPA)";
+            case "AMU": return "Asset Management Unit (AMU)";
+            case "President": return "President";
+            default: return office;
+        }
+    }
+}
+
 <div class="d-flex">
     @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
     <div class="flex-grow-1 p-2">
@@ -327,7 +340,7 @@
                                     
                                     <tr>
                                         <td>@proposal.Title</td>
-                                        <td>@proposal.TargetOfficeRole</td>
+                                        <td>@GetOfficeDisplay(proposal.TargetOfficeRole)</td>
                                         <td>
                                             @if (officeApproval?.Status == "Approved")
                                             {

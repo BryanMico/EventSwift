@@ -5,6 +5,19 @@
     ViewBag.SkipNavbar = true;
 }
 
+@functions {
+    public string GetOfficeDisplay(string office) {
+        switch (office) {
+            case "VPAA": return "VP Academic Affairs (VPAA)";
+            case "VPF": return "VP Finance (VPF)";
+            case "VPA": return "VP Administration (VPA)";
+            case "AMU": return "Asset Management Unit (AMU)";
+            case "President": return "President";
+            default: return office;
+        }
+    }
+}
+
 <div class="d-flex">
     @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
 
@@ -27,7 +40,7 @@
                             <div class="col-md-6">
                                 <h6 class="text-muted mb-2">Document Information</h6>
                                 <p><strong>Title:</strong> @Model.Title</p>
-                                <p><strong>Target Office:</strong> @Model.TargetOfficeRole</p>
+                                <p><strong>Target Office:</strong> @GetOfficeDisplay(Model.TargetOfficeRole)</p>
                                 <p><strong>Original Submission:</strong> @Model.SubmittedAt.ToString("g")</p>
                             </div>
                             <div class="col-md-6">
