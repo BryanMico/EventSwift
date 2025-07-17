@@ -187,7 +187,8 @@ namespace EventSwift.Controllers
                         Id = e.EventId,
                         Title = e.Title,
                         StartDate = (DateTime)e.ApprovedDate, // use approved date or creation date
-                Status = e.Status
+                        Status = e.Status,
+                        Venue = e.Venue // Pass Venue to calendar
                     })
                     .ToList()
             };

@@ -13,6 +13,7 @@
         extendedProps = new
         {
             status = e.Status ?? "Unknown",
+            venue = e.Venue // Add venue to extendedProps
         }
     }).ToList();
 
@@ -55,8 +56,8 @@
         font-size: 0.7rem !important;
     }
     .fc .fc-event {
-        background: var(--orange) !important;
-        border: 1px solid var(--brown) !important;
+        background: var(--green);
+        border: 1px solid var(--green);
         color: #fff !important;
         border-radius: 0.3rem;
         padding: 2px 4px !important;
@@ -425,6 +426,7 @@
                         <h4>${event.title}</h4>
                         <p><strong>Date:</strong> ${event.startStr}</p>
                         <p><strong>Status:</strong> ${event.extendedProps.status}</p>
+                        <p><strong>Venue:</strong> ${event.extendedProps.venue ? event.extendedProps.venue : 'N/A'}</p>
                     `;
                 }
 
@@ -433,9 +435,22 @@
                     height: 450,
                     events: events,
                     eventDidMount: function (info) {
-                        var status = info.event.extendedProps.status;
-                        if (status) {
-                            info.el.setAttribute('title', 'Status: ' + status);
+                        var status = (info.event.extendedProps.status || '').toLowerCase().trim();
+                        if (status === 'pending' || status === 'for approval') {
+                            info.el.style.backgroundColor = '#ffc107'; // yellow
+                            info.el.style.borderColor = '#ffc107';
+                            info.el.style.color = '#212529';
+                            var titleEl = info.el.querySelector('.fc-event-title');
+                            if (titleEl) titleEl.style.color = '#212529';
+                        } else {
+                            info.el.style.backgroundColor = 'var(--green)';
+                            info.el.style.borderColor = 'var(--green)';
+                            info.el.style.color = '#fff';
+                            var titleEl = info.el.querySelector('.fc-event-title');
+                            if (titleEl) titleEl.style.color = '#fff';
+                        }
+                        if (info.event.extendedProps.status) {
+                            info.el.setAttribute('title', 'Status: ' + info.event.extendedProps.status);
                         }
                     },
                     eventClick: function(info) {

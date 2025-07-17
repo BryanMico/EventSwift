@@ -11,5 +11,6 @@ namespace EventSwift.Models
         public string Title { get; set; }
         public DateTime? StartDate { get; set; }
         public string Status { get; set; }
+        public string Venue { get; set; } // Added Venue for calendar event details
     }
 }
