@@ -339,12 +339,14 @@ namespace EventSwift.Controllers
 
                 // Draw the approval text
                 BaseColor textColor = BaseColor.BLACK;
+                BaseColor violet = new BaseColor(62, 30, 130);
+
                 switch (office.ToUpper())
                 {
-                    case "VPAA": textColor = BaseColor.BLUE; break;
-                    case "VPF": textColor = BaseColor.GREEN; break;
-                    case "AMU": textColor = BaseColor.ORANGE; break;
-                    case "VPA": textColor = BaseColor.RED; break;
+                    case "VPAA": textColor = violet; break;
+                    case "VPF": textColor = violet; break;
+                    case "AMU": textColor = violet; break;
+                    case "VPA": textColor = violet; break;
                 }
                 BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                 over.BeginText();
