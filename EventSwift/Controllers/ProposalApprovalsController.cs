@@ -10,6 +10,8 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
 using BCrypt.Net;
+using PagedList;
+
 
 namespace EventSwift.Controllers
 {
@@ -23,7 +25,7 @@ namespace EventSwift.Controllers
             public List<EventProposal> Proposals { get; set; }
         }
 
-        public ActionResult ApprovalsIndex()
+        public ActionResult ApprovalsIndex(int? page)
         {
             var currentUser = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
             if (currentUser == null)
@@ -31,11 +33,14 @@ namespace EventSwift.Controllers
 
             var officeRole = currentUser.Role;
 
-            // Get all events that have at least one proposal for this office
+            int pageSize = 5;       // number of items per page
+            int pageNumber = page ?? 1;
+
             var events = db.Events
                 .Include(e => e.Proposals.Select(p => p.Approvals))
                 .Where(ev => ev.Proposals.Any(p => p.Approvals.Any(a => a.Office == officeRole)))
-                .ToList();
+                .OrderByDescending(e => e.EventId)
+                .ToPagedList(pageNumber, pageSize);
 
             return View(events);
         }

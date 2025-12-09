@@ -94,3 +94,7 @@ C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.pdb
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.Migrations.NoDuplicate.resources
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.Migrations.NoDuplicate1.resources
 C:\Users\LEGION\source\repos\EventSwift\EventSwift\obj\Debug\EventSwift.Migrations.NoDuplicate11.resources
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\PagedList.dll
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\PagedList.Mvc.dll
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\PagedList.xml
+C:\Users\LEGION\source\repos\EventSwift\EventSwift\bin\PagedList.Mvc.xml

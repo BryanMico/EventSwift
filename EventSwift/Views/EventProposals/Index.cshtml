@@ -1,9 +1,52 @@
-﻿@model IEnumerable<EventSwift.Models.Event>
+﻿@model PagedList.IPagedList<EventSwift.Models.Event>
 
+@using PagedList.Mvc
+@using PagedList
 @{
     ViewBag.Title = "My Events";
     ViewBag.SkipNavbar = true;
 }
+
+<style>
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 25px;
+    }
+
+    .pagination li {
+        margin: 0 2px;
+    }
+
+        .pagination li a,
+        .pagination li span {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-decoration: none;
+            border: 1px solid #dee2e6;
+            background: #ffffff;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .pagination li a:hover {
+                background: #0d6efd;
+                color: #fff;
+                border-color: #0d6efd;
+            }
+
+    .pagination .active span {
+        background: #0d6efd;
+        color: #fff;
+        border-color: #0d6efd;
+    }
+
+    .pagination .disabled span {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
+
 
 <div class="d-flex">
     @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
@@ -21,140 +64,140 @@
 
         <!-- Propose an Event Modal -->
         <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header" style="background-color: var(--green); color: white;">
-                <h5 class="modal-title" id="createEventModalLabel">
-                    <i class="bi bi-plus-circle me-2"></i> Create New Event with Documents
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                @using (Html.BeginForm("CreateEvent", "EventProposals", FormMethod.Post, new { id = "createEventForm", enctype = "multipart/form-data" }))
-                {
-                    @Html.AntiForgeryToken()
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <label class="form-label fw-semibold" style="color: var(--green);" for="Title">
-                                <i class="bi bi-type me-1"></i> Event Title
-                            </label>
-                            @Html.TextBox("Title", null, new { @class = "form-control", placeholder = "Enter event title", required = "required" })
-                            @Html.ValidationMessage("Title", "", new { @class = "text-danger" })
-                        </div>
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: var(--green); color: white;">
+                        <h5 class="modal-title" id="createEventModalLabel">
+                            <i class="bi bi-plus-circle me-2"></i> Create New Event with Documents
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+                    <div class="modal-body">
+                        @using (Html.BeginForm("CreateEvent", "EventProposals", FormMethod.Post, new { id = "createEventForm", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold" style="color: var(--green);" for="Title">
+                                        <i class="bi bi-type me-1"></i> Event Title
+                                    </label>
+                                    @Html.TextBox("Title", null, new { @class = "form-control", placeholder = "Enter event title", required = "required" })
+                                    @Html.ValidationMessage("Title", "", new { @class = "text-danger" })
+                                </div>
+                            </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-0" style="background-color: #f8f9fa;">
-                                <div class="card-body">
-                                    <h6 class="card-title text-primary mb-3">
-                                        <i class="bi bi-building me-2"></i>VP Academic Affairs (VPAA) Office
-                                    </h6>
-                                    <div class="custom-file-input">
-                                        <input type="file" name="VPAAFile" id="VPAAFile" class="form-control" accept=".pdf" style="display: none;" />
-                                        <button type="button" class="btn btn-outline-primary w-100" onclick="document.getElementById('VPAAFile').click();">
-                                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload VP Academic Affairs (VPAA) Document
-                                        </button>
-                                        <span id="VPAA-file-name" class="ms-2 text-muted small d-block mt-2"></span>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0" style="background-color: #f8f9fa;">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary mb-3">
+                                                <i class="bi bi-building me-2"></i>VP Academic Affairs (VPAA) Office
+                                            </h6>
+                                            <div class="custom-file-input">
+                                                <input type="file" name="VPAAFile" id="VPAAFile" class="form-control" accept=".pdf" style="display: none;" />
+                                                <button type="button" class="btn btn-outline-primary w-100" onclick="document.getElementById('VPAAFile').click();">
+                                                    <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload VP Academic Affairs (VPAA) Document
+                                                </button>
+                                                <span id="VPAA-file-name" class="ms-2 text-muted small d-block mt-2"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0" style="background-color: #f8f9fa;">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-success mb-3">
+                                                <i class="bi bi-building me-2"></i>VP Finance (VPF) Office
+                                            </h6>
+                                            <div class="custom-file-input">
+                                                <input type="file" name="VPFFile" id="VPFFile" class="form-control" accept=".pdf" style="display: none;" />
+                                                <button type="button" class="btn btn-outline-success w-100" onclick="document.getElementById('VPFFile').click();">
+                                                    <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload VP Finance (VPF) Document
+                                                </button>
+                                                <span id="VPF-file-name" class="ms-2 text-muted small d-block mt-2"></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-0" style="background-color: #f8f9fa;">
-                                <div class="card-body">
-                                    <h6 class="card-title text-success mb-3">
-                                        <i class="bi bi-building me-2"></i>VP Finance (VPF) Office
-                                    </h6>
-                                    <div class="custom-file-input">
-                                        <input type="file" name="VPFFile" id="VPFFile" class="form-control" accept=".pdf" style="display: none;" />
-                                        <button type="button" class="btn btn-outline-success w-100" onclick="document.getElementById('VPFFile').click();">
-                                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload VP Finance (VPF) Document
-                                        </button>
-                                        <span id="VPF-file-name" class="ms-2 text-muted small d-block mt-2"></span>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0" style="background-color: #f8f9fa;">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-warning mb-3">
+                                                <i class="bi bi-building me-2"></i>Asset Management Unit (AMU) Office
+                                            </h6>
+                                            <div class="custom-file-input">
+                                                <input type="file" name="AMUFile" id="AMUFile" class="form-control" accept=".pdf" style="display: none;" />
+                                                <button type="button" class="btn btn-outline-warning w-100" onclick="document.getElementById('AMUFile').click();">
+                                                    <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload Asset Management Unit (AMU) Document
+                                                </button>
+                                                <span id="AMU-file-name" class="ms-2 text-muted small d-block mt-2"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0" style="background-color: #f8f9fa;">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-danger mb-3">
+                                                <i class="bi bi-building me-2"></i>VP Administration (VPA) Office
+                                            </h6>
+                                            <div class="custom-file-input">
+                                                <input type="file" name="VPAFile" id="VPAFile" class="form-control" accept=".pdf" style="display: none;" />
+                                                <button type="button" class="btn btn-outline-danger w-100" onclick="document.getElementById('VPAFile').click();">
+                                                    <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload VP Administration (VPA) Document
+                                                </button>
+                                                <span id="VPA-file-name" class="ms-2 text-muted small d-block mt-2"></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-0" style="background-color: #f8f9fa;">
-                                <div class="card-body">
-                                    <h6 class="card-title text-warning mb-3">
-                                        <i class="bi bi-building me-2"></i>Asset Management Unit (AMU) Office
-                                    </h6>
-                                    <div class="custom-file-input">
-                                        <input type="file" name="AMUFile" id="AMUFile" class="form-control" accept=".pdf" style="display: none;" />
-                                        <button type="button" class="btn btn-outline-warning w-100" onclick="document.getElementById('AMUFile').click();">
-                                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload Asset Management Unit (AMU) Document
-                                        </button>
-                                        <span id="AMU-file-name" class="ms-2 text-muted small d-block mt-2"></span>
-                                    </div>
-                                </div>
+                            <div class="alert alert-info" role="alert">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Note:</strong> Documents sent to VP Academic Affairs (VPAA)/VP Finance (VPF)/Asset Management Unit (AMU) will be automatically forwarded to VP Administration (VPA) after approval. VP Administration (VPA) documents go directly to VP Administration (VPA).
                             </div>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-0" style="background-color: #f8f9fa;">
-                                <div class="card-body">
-                                    <h6 class="card-title text-danger mb-3">
-                                        <i class="bi bi-building me-2"></i>VP Administration (VPA) Office
-                                    </h6>
-                                    <div class="custom-file-input">
-                                        <input type="file" name="VPAFile" id="VPAFile" class="form-control" accept=".pdf" style="display: none;" />
-                                        <button type="button" class="btn btn-outline-danger w-100" onclick="document.getElementById('VPAFile').click();">
-                                            <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload VP Administration (VPA) Document
-                                        </button>
-                                        <span id="VPA-file-name" class="ms-2 text-muted small d-block mt-2"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        }
                     </div>
-
-                    <div class="alert alert-info" role="alert">
-                        <i class="bi bi-info-circle me-2"></i>
-                        <strong>Note:</strong> Documents sent to VP Academic Affairs (VPAA)/VP Finance (VPF)/Asset Management Unit (AMU) will be automatically forwarded to VP Administration (VPA) after approval. VP Administration (VPA) documents go directly to VP Administration (VPA).
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="createEventSubmitBtn" form="createEventForm" class="btn btn-custom d-flex align-items-center gap-2">
+                            <span id="createEventSpinner" class="d-none" role="status" aria-hidden="true">
+                                <span class="spinner-border spinner-border-sm me-2 only-spinner" style="vertical-align: middle;"></span>
+                            </span>
+                            <i class="bi bi-plus-circle"></i> <span class="spinner-text">Create Event</span>
+                        </button>
                     </div>
-                }
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" id="createEventSubmitBtn" form="createEventForm" class="btn btn-custom d-flex align-items-center gap-2">
-                    <span id="createEventSpinner" class="d-none" role="status" aria-hidden="true">
-                        <span class="spinner-border spinner-border-sm me-2 only-spinner" style="vertical-align: middle;"></span>
-                    </span>
-                    <i class="bi bi-plus-circle"></i> <span class="spinner-text">Create Event</span>
-                </button>
-              </div>
+                </div>
             </div>
-          </div>
         </div>
 
         @* Add a hidden form for deletion, and a modal for confirmation *@
         <div id="deleteConfirmModal" class="modal fade" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <p>Are you sure you want to <span id="deleteActionText">delete</span> this event? This action cannot be undone.</p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="deleteEventForm" method="post" action="@Url.Action("DeleteEvent", "EventProposals")">
-                  @Html.AntiForgeryToken()
-                  <input type="hidden" name="eventId" id="deleteEventIdInput" />
-                  <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> <span id="deleteButtonText">Delete</span></button>
-                </form>
-              </div>
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to <span id="deleteActionText">delete</span> this event? This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form id="deleteEventForm" method="post" action="@Url.Action("DeleteEvent", "EventProposals")">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="eventId" id="deleteEventIdInput" />
+                            <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> <span id="deleteButtonText">Delete</span></button>
+                        </form>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
 
         <div class="card shadow-sm border-0">
@@ -202,12 +245,38 @@
                 </table>
             </div>
         </div>
+
+        <div class="pagination-container">
+            @Html.PagedListPager(
+                Model,
+                page => Url.Action("Index", new { page }),
+                new PagedList.Mvc.PagedListRenderOptions()
+                {
+                    DisplayLinkToFirstPage = PagedList.Mvc.PagedListDisplayMode.Always,
+                    DisplayLinkToLastPage = PagedList.Mvc.PagedListDisplayMode.Always,
+                    DisplayLinkToNextPage = PagedList.Mvc.PagedListDisplayMode.Always,
+                    DisplayLinkToPreviousPage = PagedList.Mvc.PagedListDisplayMode.Always,
+
+                    MaximumPageNumbersToDisplay = 5,
+                    UlElementClasses = new[] { "pagination" },
+                    LiElementClasses = new[] { "page-item" },
+
+                    // Ensures Bootstrap-friendly classes
+                    LinkToPreviousPageFormat = "‹ Prev",
+                    LinkToNextPageFormat = "Next ›",
+                    LinkToFirstPageFormat = "« First",
+                    LinkToLastPageFormat = "Last »"
+                }
+            )
+        </div>
+
+
     </div>
 </div>
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // File input handling for modal
             const fileInputs = {
                 'VPAAFile': 'VPAA-file-name',
@@ -216,17 +285,17 @@
                 'VPAFile': 'VPA-file-name'
             };
 
-            Object.keys(fileInputs).forEach(function(inputId) {
+            Object.keys(fileInputs).forEach(function (inputId) {
                 var fileInput = document.getElementById(inputId);
                 var fileNameSpan = document.getElementById(fileInputs[inputId]);
-                
+
                 if (fileInput) {
-                    fileInput.addEventListener('change', function() {
+                    fileInput.addEventListener('change', function () {
                         if (this.files.length > 0) {
                             var file = this.files[0];
                             var fileName = file.name;
                             var fileExtension = fileName.split('.').pop().toLowerCase();
-                            
+
                             // Check if file is PDF
                             if (fileExtension !== 'pdf') {
                                 alert('Only PDF files are allowed. Please select a PDF file.');
@@ -234,7 +303,7 @@
                                 fileNameSpan.textContent = '';
                                 return;
                             }
-                            
+
                             fileNameSpan.textContent = fileName;
                         } else {
                             fileNameSpan.textContent = '';
@@ -244,8 +313,8 @@
             });
 
             // Add loading spinner and disable button on submit for delete/cancel
-            document.querySelectorAll('form[action$="DeleteEvent"]').forEach(function(form) {
-                form.addEventListener('submit', function(e) {
+            document.querySelectorAll('form[action$="DeleteEvent"]').forEach(function (form) {
+                form.addEventListener('submit', function (e) {
                     var btn = form.querySelector('button[type="submit"]');
                     if (btn && btn.textContent.trim() !== 'Cancel') {
                         btn.disabled = true;
@@ -264,14 +333,14 @@
             var submitBtn = document.getElementById('createEventSubmitBtn');
             var spinner = document.getElementById('createEventSpinner');
             if (createEventForm && submitBtn && spinner) {
-                createEventForm.addEventListener('submit', function(e) {
+                createEventForm.addEventListener('submit', function (e) {
                     // Show spinner and disable button
                     spinner.classList.remove('d-none');
                     submitBtn.setAttribute('disabled', 'disabled');
                     submitBtn.querySelector('.spinner-text').textContent = 'Creating...';
                 });
                 // Optional: If you want to re-enable if validation fails (client-side), you can listen for invalid events
-                createEventForm.addEventListener('invalid', function(e) {
+                createEventForm.addEventListener('invalid', function (e) {
                     spinner.classList.add('d-none');
                     submitBtn.removeAttribute('disabled');
                     submitBtn.querySelector('.spinner-text').textContent = 'Create Event';
@@ -294,6 +363,7 @@
         .spinner-text {
             animation: none !important;
         }
+
         .only-spinner {
             animation: var(--bs-spinner-animation-speed) linear infinite var(--bs-spinner-animation-name) !important;
         }

@@ -1,9 +1,50 @@
-﻿@model IEnumerable<EventSwift.Models.Event>
+﻿@model PagedList.IPagedList<EventSwift.Models.Event>
 
-@{
-    ViewBag.Title = "Events for Approval";
-    ViewBag.SkipNavbar = true;
-}
+@using PagedList.Mvc
+@using PagedList
+
+@{ ViewBag.Title = "Events for Approval";
+                ViewBag.SkipNavbar = true; }
+
+<style>
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 25px;
+    }
+
+    .pagination li {
+        margin: 0 2px;
+    }
+
+        .pagination li a,
+        .pagination li span {
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-decoration: none;
+            border: 1px solid #dee2e6;
+            background: #ffffff;
+            transition: all 0.2s ease-in-out;
+        }
+
+            .pagination li a:hover {
+                background: #0d6efd;
+                color: #fff;
+                border-color: #0d6efd;
+            }
+
+    .pagination .active span {
+        background: #0d6efd;
+        color: #fff;
+        border-color: #0d6efd;
+    }
+
+    .pagination .disabled span {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
 
 <div class="d-flex">
     @Html.Partial("~/Views/Shared/_Sidebar.cshtml")
@@ -22,8 +63,7 @@
                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
                 </div>
-            </div>
-        }
+            </div>}
 
         <!-- Section Header -->
         <div class="d-flex align-items-center mb-4">
@@ -48,8 +88,7 @@
                         <i class="bi bi-calendar-x" style="font-size: 3rem; color: var(--orange);"></i>
                         <h5 class="mt-3 mb-2" style="color: var(--green);">No Events for Approval</h5>
                         <p class="text-muted mb-0">There are currently no events with documents for your office.</p>
-                    </div>
-                }
+                    </div> }
                 else
                 {
                     <div class="table-responsive">
@@ -69,10 +108,9 @@
                                             <i class="bi bi-calendar-event me-1" style="color: var(--green);"></i>@ev.Title
                                         </td>
                                         <td>
-                                            @{
-                                                var statusBadgeClass = "";
+                                            @{ var statusBadgeClass = "";
                                                 var statusText = ev.Status;
-                                                
+
                                                 if (ev.Status == "Approved")
                                                 {
                                                     statusBadgeClass = "badge";
@@ -91,10 +129,9 @@
                                                 else
                                                 {
                                                     statusBadgeClass = "badge bg-secondary";
-                                                }
-                                            }
-                                            <span class="@statusBadgeClass" style="@(ev.Status == "Approved" ? "background: var(--green); color: #fff;" : 
-                                                                                    ev.Status == "Pending" ? "background: var(--orange); color: #fff;" : 
+                                                } }
+                                            <span class="@statusBadgeClass" style="@(ev.Status == "Approved" ? "background: var(--green); color: #fff;" :
+                                                                                    ev.Status == "Pending" ? "background: var(--orange); color: #fff;" :
                                                                                     ev.Status == "Rejected" ? "background: var(--brown); color: #fff;" : "")">
                                                 @statusText
                                             </span>
@@ -110,14 +147,12 @@
                                                         {
                                                             <a href="@Url.Action("VPAEventOverview", "ProposalApprovals", new { id = ev.EventId })" class="btn btn-sm btn-warning px-3 d-inline-flex align-items-center gap-1">
                                                                 <i class="bi bi-building"></i> VPA Overview
-                                                            </a>
-                                                        }
+                                                            </a> }
                                                         else
                                                         {
                                                             <a href="@Url.Action("EventDetails", "ProposalApprovals", new { id = ev.EventId })" class="btn btn-sm btn-custom px-3 d-inline-flex align-items-center gap-1">
                                                                 <i class="bi bi-eye"></i> View
-                                                            </a>
-                                                        }
+                                                            </a>}
                                                     }
                                                 }
                                                 <button type="button" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1" onclick="confirmDelete(@ev.EventId)">
@@ -126,12 +161,35 @@
                                             </div>
                                         </td>
                                     </tr>
-                                }
+}
                             </tbody>
                         </table>
-                    </div>
-                }
+                    </div>}
             </div>
+        </div>
+
+        <div class="pagination-container">
+            @Html.PagedListPager(
+                Model,
+                page => Url.Action("ApprovalsIndex", new { page }),
+                new PagedList.Mvc.PagedListRenderOptions()
+                {
+                    DisplayLinkToFirstPage = PagedList.Mvc.PagedListDisplayMode.Always,
+                    DisplayLinkToLastPage = PagedList.Mvc.PagedListDisplayMode.Always,
+                    DisplayLinkToNextPage = PagedList.Mvc.PagedListDisplayMode.Always,
+                    DisplayLinkToPreviousPage = PagedList.Mvc.PagedListDisplayMode.Always,
+
+                    MaximumPageNumbersToDisplay = 5,
+                    UlElementClasses = new[] { "pagination" },
+                    LiElementClasses = new[] { "page-item" },
+
+                    // Ensures Bootstrap-friendly classes
+                    LinkToPreviousPageFormat = "‹ Prev",
+                    LinkToNextPageFormat = "Next ›",
+                    LinkToFirstPageFormat = "« First",
+                    LinkToLastPageFormat = "Last »"
+                }
+            )
         </div>
     </div>
 </div>
@@ -141,10 +199,9 @@
 {
     using (Html.BeginForm("DeleteEvent", "ProposalApprovals", FormMethod.Post, new { id = $"deleteForm_{ev.EventId}", style = "display: none;" }))
     {
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="eventId" value="@ev.EventId" />
-    }
-}
+@Html.AntiForgeryToken()
+                    <input type="hidden" name="eventId" value="@ev.EventId" />}
+                                }
 
 @section Scripts {
     <script>

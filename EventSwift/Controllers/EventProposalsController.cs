@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using PagedList;
+
 
 namespace EventSwift.Controllers
 {
@@ -14,14 +16,18 @@ namespace EventSwift.Controllers
         private DefaultConnection db = new DefaultConnection();
 
         // GET: EventProposals
-        public ActionResult Index()
+        public ActionResult Index(int? page)
         {
             var currentUser = db.Users.FirstOrDefault(u => u.Username == User.Identity.Name);
             if (currentUser == null) return HttpNotFound();
 
+            int pageSize = 5;     // items per page
+            int pageNumber = page ?? 1;
+
             var events = db.Events
                            .Where(e => e.ClientId == currentUser.UserId)
-                           .ToList();
+                           .OrderByDescending(e => e.EventId)
+                           .ToPagedList(pageNumber, pageSize);
 
             return View(events);
         }
